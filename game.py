@@ -1,3 +1,4 @@
+from grpc import xds_server_credentials
 import pygame
 import time
 import os
@@ -23,13 +24,32 @@ HOOP_IMG = pygame.transform.scale(
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 
+
 class BBox:
-    def __init__(self, height):
-        self.y = WIN_HEIGHT - height
+    def __init__(self, x, y, height =20, width = 20):
+        self.x = x
+        self.y = WIN_HEIGHT - y
+        self.width = width
+        self.height = height
+        self.rect = pygame.Rect((self.x, self.y) , (self.width, self.height))
+        self.mask = pygame.mask.Mask((self.width, self.height), True)
 
-  
+
+    def draw(self, win):
+        pygame.draw.rect(win, (255, 0, 0), self.rect)
 
 
+class Rim:
+    def __init__(self, x, y):
+        #left of rim edge
+        self.x = x
+        self.y = y
+        self.bboxes = [BBox(x, y), BBox(x+ HOOP_SIZE, y)]
+
+
+    def draw(self, win):
+       for b in self.bboxes:
+           b.draw(win)
 
 class Ball:
 
@@ -41,6 +61,7 @@ class Ball:
         self.y_acc = 0.1
         self.hoop = Hoop()
         self.time = 0
+        self.mask = pygame.mask.from_surface(BALL_IMG)
 
     def draw(self, win):
         win.blit(BALL_IMG, (self.x, self.y))
@@ -62,12 +83,25 @@ class Ball:
 
         self.time += .25
 
+
         self.x += self.x_vel
+
+        if (self.x <= -BALL_SIZE):
+            self.x = WIN_WIDTH - BALL_SIZE
+        elif(self.x > WIN_WIDTH):
+            self.x = 0
+
         self.y += self.y_vel * self.time + (self.y_acc) * (self.time ** 2)
 
-    def collide(self, base):
-        if self.y + BALL_SIZE > base.y:
-            self.y = base.y - BALL_SIZE
+        if self.y < -200:
+            self.y = -200
+
+    def collide(self, bbox):
+        
+
+       # if self.y + BALL_SIZE > bbox.y:
+       if self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) != None:
+            self.y = bbox.y - BALL_SIZE
             self.y_vel *= .65
             self.x_vel *= 0.5
             self.time = 0
@@ -80,10 +114,13 @@ class Hoop:
         self.y = random.randint(0, WIN_HEIGHT*.75)
         self.img = HOOP_IMG.copy()
         self.img =  self.img if self.x == 0 else pygame.transform.flip(self.img, True, False)
+        self.rim = Rim(self.x, self.y)
 
     def draw(self, win):
 
         win.blit(self.img, (self.x, self.y))
+        self.rim.draw(win)
+
 
 
 
@@ -109,7 +146,7 @@ def main():
     time = pygame.time.Clock()
     balls = [Ball()]
     hoop = Hoop()
-    ground = BBox(20)
+    ground = BBox(0, 20, 20, WIN_WIDTH)
 
 
 
