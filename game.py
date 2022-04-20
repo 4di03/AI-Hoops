@@ -28,7 +28,7 @@ STAT_FONT = pygame.font.SysFont("comicsans", 50)
 class BBox:
     def __init__(self, x, y, height =20, width = 20):
         self.x = x
-        self.y = WIN_HEIGHT - y
+        self.y = y
         self.width = width
         self.height = height
         self.rect = pygame.Rect((self.x, self.y) , (self.width, self.height))
@@ -43,8 +43,8 @@ class Rim:
     def __init__(self, x, y):
         #left of rim edge
         self.x = x
-        self.y = y
-        self.bboxes = [BBox(x, y), BBox(x+ HOOP_SIZE, y)]
+        self.y = y + 30
+        self.bboxes = [BBox(x, y), BBox(x+ HOOP_SIZE-30, y)]
 
 
     def draw(self, win):
@@ -78,8 +78,9 @@ class Ball:
         self.y_vel = -1.3
         self.time = 0
 
-    def move(self, base):
-        self.collide(base)
+    def move(self, bboxes):
+        for bbox in bboxes:
+            self.collide(bbox)
 
         self.time += .25
 
@@ -114,7 +115,9 @@ class Hoop:
         self.y = random.randint(0, WIN_HEIGHT*.75)
         self.img = HOOP_IMG.copy()
         self.img =  self.img if self.x == 0 else pygame.transform.flip(self.img, True, False)
+        print(self.x, self.y)
         self.rim = Rim(self.x, self.y)
+        print(self.rim.x, self.rim.y)
 
     def draw(self, win):
 
@@ -122,9 +125,12 @@ class Hoop:
         self.rim.draw(win)
 
 
+    
 
 
-def draw_window(win, balls, hoop):
+
+
+def draw_window(win, balls, hoop, testBox):
     win.blit(BG_IMG, (0,0))
     
     for ball in balls:
@@ -135,7 +141,7 @@ def draw_window(win, balls, hoop):
 
     # text = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
     # win.blit(text, (WIN_WIDTH-10 -text.get_width(), 10))
-    
+    testBox.draw(win)    
     pygame.display.update()
 
 
@@ -146,8 +152,9 @@ def main():
     time = pygame.time.Clock()
     balls = [Ball()]
     hoop = Hoop()
-    ground = BBox(0, 20, 20, WIN_WIDTH)
-
+    ground = BBox(0, WIN_HEIGHT-20, 20, WIN_WIDTH)
+    testBox = BBox(300, 300, 60 ,60)
+    bboxes = [ground , hoop.rim.bboxes[0], hoop.rim.bboxes[1], BBox(300, 300, 60, 60)]
 
 
     while run:
@@ -173,11 +180,12 @@ def main():
 
         for ball in balls:
                         
-            ball.move(ground)
+            ball.move(bboxes)
 
 
+        
 
-        draw_window(win,balls, hoop)
+        draw_window(win,balls, hoop, testBox)
 
 
 main()
