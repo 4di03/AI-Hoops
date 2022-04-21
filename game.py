@@ -1,4 +1,4 @@
-from grpc import xds_server_credentials
+#from grpc import xds_server_credentials
 import pygame
 import time
 import os
@@ -23,7 +23,6 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-global bboxes 
 
 bboxes = []
 
@@ -164,6 +163,7 @@ def main():
 
 
     while run:
+        global bboxes
         time.tick(250)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
