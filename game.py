@@ -83,9 +83,11 @@ class Ball:
         self.time = 0
 
     def move(self, bboxes):
-        print(round(self.x), ", " , round(self.y))
         for bbox in bboxes:
             self.collide(bbox)
+        
+        print(round(self.x_vel), ", " , round(self.y_vel))
+
 
         self.time += .25
 
@@ -104,13 +106,27 @@ class Ball:
 
     def collide(self, bbox):
        col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y))
-      # if col_point != None: print(col_point)
+       if col_point != None: print(col_point)
        if col_point != None:
-            print("detedcetd")
-            self.y = bbox.y - BALL_SIZE
-            self.y_vel *= .65
-            self.x_vel *= 0.5
-            self.time = 0
+            
+
+            if col_point[0] > 40 or col_point[0] < 10 and (col_point[1] >=10 and col_point[1]<=30):
+                self.x_vel = 0
+                self.y_vel = 0
+            elif col_point[1] > 10:#bbox.y < self.y + BALL_SIZE and bbox.y > self.y:
+                #print("detedcetd")
+                self.y = bbox.y - BALL_SIZE
+                self.y_vel *= .65
+                self.x_vel *= 0.5
+                self.time = 0
+
+            elif col_point[1] <= 10: 
+                self.y = bbox.y + bbox.height
+                self.y_vel = 0
+                self.time = 0
+
+           
+
 
 
 class Hoop:
@@ -179,10 +195,10 @@ def main():
                     main()
  
                 if event.key == pygame.K_d:
-                        print("jump right")
+                        #print("jump right")
                         balls[0].jump(True)
                 if event.key == pygame.K_a:
-                        print("jump left")
+                        #print("jump left")
                         balls[0].jump(False)
 
         for ball in balls:
