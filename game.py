@@ -5,6 +5,7 @@ import os
 import random
 pygame.font.init()
 
+balls = []
 
 WIN_WIDTH = 800
 WIN_HEIGHT = 500
@@ -23,7 +24,7 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 100
+ALLOWED_TIME = 1000
 
 bboxes = []
 font = pygame.font.SysFont('Comic Sans MS', 30)
@@ -52,18 +53,21 @@ class Rim:
         #left of rim edge
         self.x = x 
         self.y = y
-        leftRim =  BBox(self.x if self.x == 0 else self.x -15, self.y)
-        rightRim = BBox((self.x + HOOP_SIZE + 5 if self.x == 0 else self.x+HOOP_SIZE -15), self.y)
-        goal = BBox(leftRim.x + leftRim.width, self.y, height = 5, width = HOOP_SIZE - leftRim.width, passable = True)
+        leftRim =  BBox(self.x - 10, self.y)
+        rightRim = BBox((self.x + HOOP_SIZE - 10 ), self.y)
+        goal = BBox(leftRim.x + leftRim.width, self.y, height = 5, width = HOOP_SIZE - leftRim.width + 10, passable = True)
         self.bboxes = [leftRim, rightRim, goal]
 
 
     def draw(self, win):
-       for b in self.bboxes:
-           b.draw(win)
+        return    
+         
+        # for b in self.bboxes:
+        #   b.draw(win)
+
 
 class Ball:
-
+    global balls
     def __init__(self):
         self.x = (WIN_WIDTH/2) - BALL_SIZE
         self.y = (WIN_HEIGHT/2) - BALL_SIZE
@@ -75,6 +79,7 @@ class Ball:
         self.mask = pygame.mask.from_surface(BALL_IMG)
         self.score = 0
         self.tick = ALLOWED_TIME
+        balls.append(self)
 
     def draw(self, win):
         
@@ -103,7 +108,7 @@ class Ball:
         self.tick -= 1
 
         if self.tick <= 0:
-            del self
+            balls.remove(self)
             return
         for bbox in bboxes:
             self.collide(bbox)
@@ -152,7 +157,10 @@ class Ball:
                     self.y_vel = 0
             elif dy > 0:
                 self.tick = ALLOWED_TIME
+                self.y = bbox.y+bbox.height + 20
                 self.score += 1
+                self.hoop.clear()
+                self.hoop = Hoop()
 
 
            
@@ -160,7 +168,7 @@ class Ball:
 
 
 class Hoop:
-
+    global bboxes
     def __init__(self):
         self.x = random.randint(0,1) * (WIN_WIDTH - HOOP_SIZE)
         self.y = random.randint(0, WIN_HEIGHT*.75)
@@ -175,6 +183,11 @@ class Hoop:
         win.blit(self.img, (self.x, self.y))
         self.rim.draw(win)
 
+
+
+    def clear(self):
+        for bbox in self.rim.bboxes:
+            bboxes.remove(bbox)
 
     
 
@@ -198,21 +211,24 @@ def draw_window(win, balls, testBox = None):
 
 
 def main():
+    global balls
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-    run = True
+    #run = len(balls) > 0
     time = pygame.time.Clock()
-    balls = [Ball()]
+    Ball()
+    Ball()
+    Ball()
+    #balls = [Ball()]
     ground = BBox(0, WIN_HEIGHT-20, 500, WIN_WIDTH)
     #testBox = BBox(300, 300, 20 ,20)
     #bboxes = [ground , hoop.rim.bboxes[0], hoop.rim.bboxes[1], testBox]
 
 
-    while run:
+    while True:
         global bboxes
         #for bbox in bboxes:
             #print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
 
-        print()
         time.tick(250)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -223,8 +239,8 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     print("restarting")
-                    pygame.quit()
                     bboxes = []
+                    balls = []
                     main()
  
                 if event.key == pygame.K_d:
@@ -240,8 +256,12 @@ def main():
 
 
         
+        
 
         draw_window(win,balls)#,  testBox)
+
+        if len(balls) == 0:
+            break
 
 
 main()
