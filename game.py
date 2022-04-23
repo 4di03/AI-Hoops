@@ -23,6 +23,7 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
+ALLOWED_TIME = 100
 
 bboxes = []
 font = pygame.font.SysFont('Comic Sans MS', 30)
@@ -73,9 +74,13 @@ class Ball:
         self.time = 0
         self.mask = pygame.mask.from_surface(BALL_IMG)
         self.score = 0
+        self.tick = ALLOWED_TIME
 
     def draw(self, win):
-        text_surface = font.render('Score: '+ str(self.score), False, (255, 255, 255))
+        
+        text_surface = font.render('Score: '+ str(self.score) + 'Time: '+ str(self.tick), False, (255, 255, 255))
+   
+
         self.hoop.draw(win)
         win.blit(BALL_IMG, (self.x, self.y))
         win.blit(text_surface, (WIN_WIDTH/2,0))
@@ -95,11 +100,13 @@ class Ball:
         self.time = 0
 
     def move(self, bboxes):
+        self.tick -= 1
+
+        if self.tick <= 0:
+            del self
+            return
         for bbox in bboxes:
             self.collide(bbox)
-        
-       # print(round(self.x_vel), ", " , round(self.y_vel))
-
 
         self.time += .25
 
@@ -144,26 +151,9 @@ class Ball:
                     self.x_vel = 0
                     self.y_vel = 0
             elif dy > 0:
+                self.tick = ALLOWED_TIME
                 self.score += 1
 
-            '''
-            if col_point[1] > 10 and (col_point[0] <= 40 or col_point[0] >= 10): #or self.y+BALL_SIZE > WIN_HEIGHT:
-                #print("detedcetd")
-                self.y = bbox.y - BALL_SIZE
-                self.y_vel *= .65
-                self.x_vel *= 0.5
-                self.time = 0
-            elif ((col_point[0] > 40 or col_point[0] < 10) and (col_point[1] >=10 and col_point[1]<=30)):
-                self.x_vel = 0
-                self.y_vel = 0
-            
-
-            elif col_point[1] <= 10: 
-                self.y = bbox.y + bbox.height
-                self.y_vel = 2
-                self.time = 2
-
-                '''
 
            
 
@@ -219,8 +209,8 @@ def main():
 
     while run:
         global bboxes
-        for bbox in bboxes:
-            print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
+        #for bbox in bboxes:
+            #print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
 
         print()
         time.tick(250)
