@@ -29,13 +29,14 @@ STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 ALLOWED_TIME = 1000
 
-bboxes = []
+#bboxes = []
+
 font = pygame.font.SysFont('Comic Sans MS', 30)
 
 GEN = 0
 
 class BBox:
-    global bboxes
+    #global bboxes
     def __init__(self, x, y, height =5, width = 20, passable = False):
         self.x = x
         self.y = y+2
@@ -43,12 +44,14 @@ class BBox:
         self.height = height
         self.rect = pygame.Rect((self.x, self.y) , (self.width, self.height))
         self.mask = pygame.mask.Mask((self.width, self.height), True)
-        bboxes.append(self)
+        #bboxes.append(self)
         self.passable = passable
 
 
     def draw(self, win):
         pygame.draw.rect(win, (0, 255, 0) if not self.passable else (0, 0 , 255), self.rect)
+
+ground = BBox(0, WIN_HEIGHT-20, 500, WIN_WIDTH)
 
 
 class Rim:
@@ -71,6 +74,7 @@ class Rim:
 
 class Ball:
     global balls
+    global ground
     def __init__(self):
         self.x = (WIN_WIDTH/2) - BALL_SIZE
         self.y = (WIN_HEIGHT/2) - BALL_SIZE
@@ -108,15 +112,15 @@ class Ball:
         self.y_vel = -1.3
         self.time = 0
 
-    def move(self, bboxes, nets , ge ,i):
+    def move(self, nets , ge ,i):
         self.tick0 += 1
         
         self.tick -= 1
-        ge[i].fitness += .1
+        #ge[i].fitness += .1
 
         if self.tick <= 0:
             #ge[i].fitness += .1
-            self.hoop.clear()
+            #self.hoop.clear()
             balls.pop(i)
             nets.pop(i)
             ge.pop(i)
@@ -135,8 +139,10 @@ class Ball:
             elif x == 1:
                 self.jump(False)
         
-        for bbox in bboxes:
-            self.collide(bbox)
+        for bbox in self.hoop.rim.bboxes:
+            self.collide(bbox, ge, i)
+
+        self.collide(ground,ge , i)
 
         self.time += .25
 
@@ -156,7 +162,7 @@ class Ball:
         if self.y < -200:
             self.y = -200
 
-    def collide(self, bbox):
+    def collide(self, bbox, ge , i):
        col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) 
        if col_point != None:
             
@@ -184,8 +190,8 @@ class Ball:
                 self.tick = ALLOWED_TIME
                 self.y = bbox.y+bbox.height + 20
                 self.score += 1
-                #ge[i].fitness += 1
-                self.hoop.clear()
+                ge[i].fitness += 1
+                #self.hoop.clear()
                 self.hoop = Hoop()
 
 
@@ -194,7 +200,7 @@ class Ball:
 
 
 class Hoop:
-    global bboxes
+    #global bboxes
     def __init__(self):
         self.x = random.randint(0,1) * (WIN_WIDTH - HOOP_SIZE)
         self.y = random.randint(0, WIN_HEIGHT*.75)
@@ -257,15 +263,14 @@ def main(genomes, config):
     # Ball()
     # Ball()
     #balls = [Ball()]
-    ground = BBox(0, WIN_HEIGHT-20, 500, WIN_WIDTH)
     #testBox = BBox(300, 300, 20 ,20)
     #bboxes = [ground , hoop.rim.bboxes[0], hoop.rim.bboxes[1], testBox]
 
     run = True
     while run:
         global bboxes
-        for bbox in bboxes:
-            print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
+        # for bbox in bboxes:
+        #     print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
 
         time.tick(250)
         for event in pygame.event.get():
@@ -288,12 +293,12 @@ def main(genomes, config):
                 #         #print("jump left")
                 #         balls[0].jump(False)
         
-        print(len(ge))
-        print(len(balls))
-        print(len(nets))
+        # print(len(ge))
+        # print(len(balls))
+        # print(len(nets))
         for i, ball in enumerate(balls):
                 
-            ball.move(bboxes, nets, ge , i)
+            ball.move(nets, ge , i)
 
             #feed net x, y of ball , and x, y of hoop
             
