@@ -27,11 +27,11 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 1000
+ALLOWED_TIME = 500
 
 #bboxes = []
 
-font = pygame.font.SysFont('Comic Sans MS', 30)
+font = pygame.font.SysFont('Comic Sans MS', 10)
 
 GEN = 0
 
@@ -90,13 +90,15 @@ class Ball:
         self.tick0 = 0
 
     def draw(self, win):
-        
-        #text_surface = font.render('Score: '+ str(self.score) + 'Time: '+ str(self.tick), False, (255, 255, 255))
+        hpBar = pygame.Rect((self.x, self.y -20) , (BALL_SIZE * (self.tick/ALLOWED_TIME), 15))
+
+        text_surface = font.render('Score: '+ str(self.score), False, (255, 255, 255))
    
 
         self.hoop.draw(win)
         win.blit(BALL_IMG, (self.x, self.y))
-       # win.blit(text_surface, (WIN_WIDTH/2,0))
+        pygame.draw.rect(win,(0, 255, 0), hpBar)
+        win.blit(text_surface, (self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2 - 10))
 
         
 
@@ -129,7 +131,7 @@ class Ball:
 
         if self.tick0 % 60 == 0:
 
-            output = nets[i].activate((self.x, self.y, self.hoop.x, self.hoop.y)) #abs(bird.y-pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
+            output = nets[i].activate((self.x, self.y, self.hoop.x, self.hoop.y))
 
             x = output.index(max(output))
 
@@ -272,7 +274,7 @@ def main(genomes, config):
         # for bbox in bboxes:
         #     print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
 
-        time.tick(250)
+        time.tick(120)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
