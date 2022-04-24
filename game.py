@@ -27,7 +27,7 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 500
+ALLOWED_TIME = 1200
 
 #bboxes = []
 
@@ -118,7 +118,7 @@ class Ball:
         self.tick0 += 1
         
         self.tick -= 1
-        #ge[i].fitness += .1
+        ge[i].fitness += .1
 
         if self.tick <= 0:
             #ge[i].fitness += .1
@@ -131,7 +131,7 @@ class Ball:
 
         if self.tick0 % 60 == 0:
 
-            output = nets[i].activate((self.x, self.y, self.hoop.x, self.hoop.y))
+            output = nets[i].activate((self.x, self.y, self.hoop.x, self.hoop.y, self.time))
 
             x = output.index(max(output))
 
@@ -192,7 +192,7 @@ class Ball:
                 self.tick = ALLOWED_TIME
                 self.y = bbox.y+bbox.height + 20
                 self.score += 1
-                ge[i].fitness += 1
+                ge[i].fitness += 10
                 #self.hoop.clear()
                 self.hoop = Hoop()
 
@@ -234,8 +234,8 @@ def draw_window(win, balls, testBox = None):
 
     
 
-    # text = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
-    # win.blit(text, (WIN_WIDTH-10 -text.get_width(), 10))
+    text = STAT_FONT.render("Generation: " + str(GEN), 1, (255, 255, 255))
+    win.blit(text, (WIN_WIDTH/2 - text.get_width(), 10))
     if testBox != None: testBox.draw(win)    
     pygame.display.update()
 
@@ -274,7 +274,7 @@ def main(genomes, config):
         # for bbox in bboxes:
         #     print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
 
-        time.tick(120)
+        time.tick(200)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -312,8 +312,7 @@ def main(genomes, config):
         draw_window(win,balls)#,  testBox)
 
         if len(balls) == 0:
-            run = False
-            break
+            return
 
 
 #main()
