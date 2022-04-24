@@ -1,6 +1,6 @@
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 3000
+fitness_threshold     = 600
 pop_size              = 20
 reset_on_extinction   = False
 
@@ -45,7 +45,7 @@ node_delete_prob        = 0.4
 
 # network parameters
 num_hidden              = 5
-num_inputs              = 5
+num_inputs              = 3
 num_outputs             = 3
 
 # node response options
@@ -71,9 +71,9 @@ compatibility_threshold = 3.0
 
 [DefaultStagnation]
 species_fitness_func = max
-max_stagnation       = 5
+max_stagnation       = 10
 species_elitism      = 0
 
 [DefaultReproduction]
-elitism            = 1
+elitism            = 2
 survival_threshold = 0.2

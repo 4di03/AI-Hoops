@@ -7,6 +7,7 @@ import os
 import random
 pygame.font.init()
 import neat
+import pickle
 
 balls = []
 
@@ -93,14 +94,15 @@ class Ball:
         hpBar = pygame.Rect((self.x, self.y -20) , (BALL_SIZE * (self.tick/ALLOWED_TIME), 15))
 
         text_surface = font.render('Score: '+ str(self.score), False, (255, 255, 255))
+        text_surface2 = font.render('Hoop at: '+ str(self.hoop.x) + ", " +str(self.hoop.y), False, (255, 255, 255))
+
    
 
         self.hoop.draw(win)
         win.blit(BALL_IMG, (self.x, self.y))
         pygame.draw.rect(win,(0, 255, 0), hpBar)
         win.blit(text_surface, (self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2 - 10))
-
-        
+#        win.blit(text_surface2, (self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2))
 
 
     def jump(self, right):
@@ -109,7 +111,6 @@ class Ball:
             self.x_vel = 2
         else:
             self.x_vel = -2
-
 
         self.y_vel = -1.3
         self.time = 0
@@ -129,17 +130,7 @@ class Ball:
             return
 
 
-        if self.tick0 % 60 == 0:
-
-            output = nets[i].activate((self.x, self.y, self.hoop.x, self.hoop.y, self.time))
-
-            x = output.index(max(output))
-
-
-            if x == 0:
-                self.jump(True)
-            elif x == 1:
-                self.jump(False)
+      
         
         for bbox in self.hoop.rim.bboxes:
             self.collide(bbox, ge, i)
@@ -163,6 +154,17 @@ class Ball:
 
         if self.y < -200:
             self.y = -200
+
+        if self.tick0 % 1 == 0:
+
+            output = nets[i].activate((self.hoop.x - self.x, self.hoop.y - self.y, self.time))
+
+            x = output.index(max(output))
+
+            if x == 0:
+                self.jump(True)
+            elif x == 1:
+                self.jump(False)
 
     def collide(self, bbox, ge , i):
        col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) 
@@ -298,11 +300,16 @@ def main(genomes, config):
         # print(len(ge))
         # print(len(balls))
         # print(len(nets))
-        for i, ball in enumerate(balls):
-                
+        i = len(balls) - 1
+        while i >= 0:
+
+            ball = balls[i]
+
             ball.move(nets, ge , i)
 
-            #feed net x, y of ball , and x, y of hoop
+            i -= 1
+
+            
             
 
 
@@ -318,6 +325,20 @@ def main(genomes, config):
 #main()
 
 
+def replay_genome(config_path, genome_path="winner.pkl"):
+    # Load requried NEAT config
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+
+    # Unpickle saved winner
+    with open(genome_path, "rb") as f:
+        genome = pickle.load(f)
+
+    # Convert loaded genome into required data structure
+    genomes = [(1, genome)]
+
+    # Call game with only the loaded genome
+    main(genomes, config)
+
 if __name__ == "__main__":
 
     config_path = "./config-feedforward.txt"
@@ -332,4 +353,10 @@ if __name__ == "__main__":
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    p.run(main, 1000)
+    winner = p.run(main, 1000)
+    with open("winner.pkl", "wb") as f:
+        pickle.dump(winner, f)
+        f.close()
+
+    replay_genome(config_path,)
+
