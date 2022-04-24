@@ -1,12 +1,9 @@
 #from grpc import xds_server_credentials
-from inspect import GEN_CLOSED
-from ipaddress import _IPAddressBase
 import pygame
 import time
 import os
 import random
 pygame.font.init()
-import neat
 
 balls = []
 
@@ -27,12 +24,12 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 1000
+ALLOWED_TIME = 10000000
 
 bboxes = []
 font = pygame.font.SysFont('Comic Sans MS', 30)
 
-GEN = 0
+
 
 class BBox:
     global bboxes
@@ -63,10 +60,10 @@ class Rim:
 
 
     def draw(self, win):
-        return    
+        #return    
          
-        # for b in self.bboxes:
-        #   b.draw(win)
+         for b in self.bboxes:
+           b.draw(win)
 
 
 class Ball:
@@ -83,16 +80,15 @@ class Ball:
         self.score = 0
         self.tick = ALLOWED_TIME
         balls.append(self)
-        self.tick0 = 0
 
     def draw(self, win):
         
-        #text_surface = font.render('Score: '+ str(self.score) + 'Time: '+ str(self.tick), False, (255, 255, 255))
+        text_surface = font.render('Score: '+ str(self.score) + 'Time: '+ str(self.tick), False, (255, 255, 255))
    
 
         self.hoop.draw(win)
         win.blit(BALL_IMG, (self.x, self.y))
-       # win.blit(text_surface, (WIN_WIDTH/2,0))
+        win.blit(text_surface, (WIN_WIDTH/2,0))
 
         
 
@@ -108,33 +104,12 @@ class Ball:
         self.y_vel = -1.3
         self.time = 0
 
-    def move(self, bboxes, nets , ge ,i):
-        self.tick0 += 1
-        
+    def move(self, bboxes):
         self.tick -= 1
-        ge[i].fitness += .1
 
         if self.tick <= 0:
-            #ge[i].fitness += .1
-            self.hoop.clear()
-            balls.pop(i)
-            nets.pop(i)
-            ge.pop(i)
+            balls.remove(self)
             return
-
-
-        if self.tick0 % 60 == 0:
-
-            output = nets[i].activate((self.x, self.y, self.hoop.x, self.hoop.y)) #abs(bird.y-pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
-
-            x = output.index(max(output))
-
-
-            if x == 0:
-                self.jump(True)
-            elif x == 1:
-                self.jump(False)
-        
         for bbox in bboxes:
             self.collide(bbox)
 
@@ -177,14 +152,13 @@ class Ball:
                         self.y_vel = 0
                         self.time = 0
                 elif dy != 0 and dx != 0: 
-                    #print("bruh")
+                    print("bruh")
                     self.x_vel = 0
                     self.y_vel = 0
             elif dy > 0:
                 self.tick = ALLOWED_TIME
                 self.y = bbox.y+bbox.height + 20
                 self.score += 1
-                #ge[i].fitness += 1
                 self.hoop.clear()
                 self.hoop = Hoop()
 
@@ -200,9 +174,9 @@ class Hoop:
         self.y = random.randint(0, WIN_HEIGHT*.75)
         self.img = HOOP_IMG.copy()
         self.img =  self.img if self.x == 0 else pygame.transform.flip(self.img, True, False)
-        #print(self.x, self.y)
+        print(self.x, self.y)
         self.rim = Rim(self.x, self.y)
-        #print(self.rim.x, self.rim.y)
+        print(self.rim.x, self.rim.y)
 
     def draw(self, win):
 
@@ -214,6 +188,9 @@ class Hoop:
     def clear(self):
         for bbox in self.rim.bboxes:
             bboxes.remove(bbox)
+
+    
+
 
 
 
@@ -233,39 +210,24 @@ def draw_window(win, balls, testBox = None):
 
 
 
-def main(genomes, config):
-    global GEN
+def main():
     global balls
-    
-    GEN += 1
-  
-    nets = []
-    ge = []
-
-    for genome_id , g in genomes:
-        net = neat.nn.FeedForwardNetwork.create(g, config)
-        nets.append(net)
-        #balls.append(Ball())
-        Ball()
-        g.fitness = 0
-        ge.append(g)
-
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     #run = len(balls) > 0
     time = pygame.time.Clock()
-    # Ball()
-    # Ball()
-    # Ball()
+    #Ball()
+   #Ball()
+    Ball()
     #balls = [Ball()]
     ground = BBox(0, WIN_HEIGHT-20, 500, WIN_WIDTH)
     #testBox = BBox(300, 300, 20 ,20)
     #bboxes = [ground , hoop.rim.bboxes[0], hoop.rim.bboxes[1], testBox]
 
-    run = True
-    while run:
+
+    while True:
         global bboxes
-        for bbox in bboxes:
-            print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
+        #for bbox in bboxes:
+            #print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
 
         time.tick(250)
         for event in pygame.event.get():
@@ -280,23 +242,17 @@ def main(genomes, config):
                     bboxes = []
                     balls = []
                     main()
+ 
+                if event.key == pygame.K_d:
+                        #print("jump right")
+                        balls[0].jump(True)
+                if event.key == pygame.K_a:
+                        #print("jump left")
+                        balls[0].jump(False)
 
-                # if event.key == pygame.K_d:
-                #         #print("jump right")
-                #         balls[0].jump(True)
-                # if event.key == pygame.K_a:
-                #         #print("jump left")
-                #         balls[0].jump(False)
-        
-        print(len(ge))
-        print(len(balls))
-        print(len(nets))
-        for i, ball in enumerate(balls):
-                
-            ball.move(bboxes, nets, ge , i)
-
-            #feed net x, y of ball , and x, y of hoop
-            
+        for ball in balls:
+                        
+            ball.move(bboxes)
 
 
         
@@ -305,25 +261,7 @@ def main(genomes, config):
         draw_window(win,balls)#,  testBox)
 
         if len(balls) == 0:
-            run = False
             break
 
 
-#main()
-
-
-if __name__ == "__main__":
-
-    config_path = "./config-feedforward.txt"
-    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
-        neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
-
-
-    p = neat.Population(config)
-
-
-    p.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    p.add_reporter(stats)
-
-    p.run(main, 1000)
+main()
