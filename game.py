@@ -358,5 +358,5 @@ if __name__ == "__main__":
         pickle.dump(winner, f)
         f.close()
 
-    replay_genome(config_path,)
+    replay_genome(config_path)
 
