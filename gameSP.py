@@ -1,9 +1,13 @@
 #from grpc import xds_server_credentials
+from inspect import GEN_CLOSED
+from ipaddress import _IPAddressBase
 import pygame
 import time
 import os
 import random
 pygame.font.init()
+import neat
+import pickle
 
 balls = []
 
@@ -24,28 +28,31 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 10000000
+ALLOWED_TIME = 1200
 
-bboxes = []
-font = pygame.font.SysFont('Comic Sans MS', 30)
+#bboxes = []
 
+font = pygame.font.SysFont('Comic Sans MS', 10)
 
+GEN = 0
 
 class BBox:
-    global bboxes
-    def __init__(self, x, y, height =5, width = 20, passable = False):
+    #global bboxes
+    def __init__(self, x, y, height =5, width = 2, passable = False):
         self.x = x
         self.y = y+2
         self.width = width
         self.height = height
         self.rect = pygame.Rect((self.x, self.y) , (self.width, self.height))
         self.mask = pygame.mask.Mask((self.width, self.height), True)
-        bboxes.append(self)
+        #bboxes.append(self)
         self.passable = passable
 
 
     def draw(self, win):
         pygame.draw.rect(win, (0, 255, 0) if not self.passable else (0, 0 , 255), self.rect)
+
+ground = BBox(0, WIN_HEIGHT-20, 500, WIN_WIDTH)
 
 
 class Rim:
@@ -53,21 +60,21 @@ class Rim:
         #left of rim edge
         self.x = x 
         self.y = y
-        leftRim =  BBox(self.x - 10, self.y)
-        rightRim = BBox((self.x + HOOP_SIZE - 10 ), self.y)
-        goal = BBox(leftRim.x + leftRim.width, self.y, height = 5, width = HOOP_SIZE - leftRim.width + 10, passable = True)
-        self.bboxes = [leftRim, rightRim, goal]
+        leftRim =  BBox(self.x , self.y)
+        rightRim = BBox((self.x + HOOP_SIZE) if self.x == 0 else self.x + HOOP_SIZE - 2, self.y)
+        self.goal = BBox(leftRim.x + leftRim.width, self.y, height = 5, width = HOOP_SIZE - leftRim.width, passable = True)
+        self.bboxes = [ self.goal, leftRim, rightRim]
 
 
     def draw(self, win):
-        #return    
          
-         for b in self.bboxes:
-           b.draw(win)
+        for b in self.bboxes:
+          b.draw(win)
 
 
 class Ball:
     global balls
+    global ground
     def __init__(self):
         self.x = (WIN_WIDTH/2) - BALL_SIZE
         self.y = (WIN_HEIGHT/2) - BALL_SIZE
@@ -80,17 +87,21 @@ class Ball:
         self.score = 0
         self.tick = ALLOWED_TIME
         balls.append(self)
+        self.tick0 = 0
 
     def draw(self, win):
-        
-        text_surface = font.render('Score: '+ str(self.score) + 'Time: '+ str(self.tick), False, (255, 255, 255))
+        hpBar = pygame.Rect((self.x, self.y -20) , (BALL_SIZE * (self.tick/ALLOWED_TIME), 15))
+
+        text_surface = font.render('Score: '+ str(self.score), False, (255, 255, 255))
+        text_surface2 = font.render('Hoop at: '+ str(self.hoop.x) + ", " +str(self.hoop.y), False, (255, 255, 255))
+
    
 
         self.hoop.draw(win)
         win.blit(BALL_IMG, (self.x, self.y))
-        win.blit(text_surface, (WIN_WIDTH/2,0))
-
-        
+        pygame.draw.rect(win,(0, 255, 0), hpBar)
+        win.blit(text_surface, (self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2 - 10))
+#        win.blit(text_surface2, (self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2))
 
 
     def jump(self, right):
@@ -100,18 +111,27 @@ class Ball:
         else:
             self.x_vel = -2
 
-
         self.y_vel = -1.3
         self.time = 0
 
-    def move(self, bboxes):
+    def move(self ,i):
+        self.tick0 += 1
+        
         self.tick -= 1
 
         if self.tick <= 0:
-            balls.remove(self)
+            #ge[i].fitness += .1
+            #self.hoop.clear()
+            balls.pop(i)
             return
-        for bbox in bboxes:
-            self.collide(bbox)
+
+
+      
+        
+        for bbox in self.hoop.rim.bboxes:
+            self.collide(bbox, i)
+
+        self.collide(ground , i)
 
         self.time += .25
 
@@ -131,7 +151,9 @@ class Ball:
         if self.y < -200:
             self.y = -200
 
-    def collide(self, bbox):
+       
+
+    def collide(self, bbox , i):
        col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) 
        if col_point != None:
             
@@ -152,14 +174,14 @@ class Ball:
                         self.y_vel = 0
                         self.time = 0
                 elif dy != 0 and dx != 0: 
-                    print("bruh")
+                    #print("bruh")
                     self.x_vel = 0
                     self.y_vel = 0
             elif dy > 0:
                 self.tick = ALLOWED_TIME
                 self.y = bbox.y+bbox.height + 20
                 self.score += 1
-                self.hoop.clear()
+                #self.hoop.clear()
                 self.hoop = Hoop()
 
 
@@ -168,15 +190,15 @@ class Ball:
 
 
 class Hoop:
-    global bboxes
+    #global bboxes
     def __init__(self):
         self.x = random.randint(0,1) * (WIN_WIDTH - HOOP_SIZE)
         self.y = random.randint(0, WIN_HEIGHT*.75)
         self.img = HOOP_IMG.copy()
         self.img =  self.img if self.x == 0 else pygame.transform.flip(self.img, True, False)
-        print(self.x, self.y)
+        #print(self.x, self.y)
         self.rim = Rim(self.x, self.y)
-        print(self.rim.x, self.rim.y)
+        #print(self.rim.x, self.rim.y)
 
     def draw(self, win):
 
@@ -189,9 +211,6 @@ class Hoop:
         for bbox in self.rim.bboxes:
             bboxes.remove(bbox)
 
-    
-
-
 
 
 def draw_window(win, balls, testBox = None):
@@ -203,31 +222,34 @@ def draw_window(win, balls, testBox = None):
 
     
 
-    # text = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
-    # win.blit(text, (WIN_WIDTH-10 -text.get_width(), 10))
+    text = STAT_FONT.render("Generation: " + str(GEN), 1, (255, 255, 255))
+    win.blit(text, (WIN_WIDTH/2 - text.get_width(), 10))
     if testBox != None: testBox.draw(win)    
     pygame.display.update()
 
 
 
 def main():
+    global GEN
     global balls
+    
+    Ball()
+
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     #run = len(balls) > 0
     time = pygame.time.Clock()
-    #Ball()
-   #Ball()
-    Ball()
+    # Ball()
+    # Ball()
+    # Ball()
     #balls = [Ball()]
-    ground = BBox(0, WIN_HEIGHT-20, 500, WIN_WIDTH)
     #testBox = BBox(300, 300, 20 ,20)
     #bboxes = [ground , hoop.rim.bboxes[0], hoop.rim.bboxes[1], testBox]
 
-
-    while True:
+    run = True
+    while run:
         global bboxes
-        #for bbox in bboxes:
-            #print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
+        # for bbox in bboxes:
+        #     print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
 
         time.tick(250)
         for event in pygame.event.get():
@@ -242,17 +264,28 @@ def main():
                     bboxes = []
                     balls = []
                     main()
- 
+
                 if event.key == pygame.K_d:
                         #print("jump right")
                         balls[0].jump(True)
                 if event.key == pygame.K_a:
                         #print("jump left")
                         balls[0].jump(False)
+        
+        # print(len(ge))
+        # print(len(balls))
+        # print(len(nets))
+        i = len(balls) - 1
+        while i >= 0:
 
-        for ball in balls:
-                        
-            ball.move(bboxes)
+            ball = balls[i]
+
+            ball.move(i)
+
+            i -= 1
+
+            
+            
 
 
         
@@ -261,7 +294,10 @@ def main():
         draw_window(win,balls)#,  testBox)
 
         if len(balls) == 0:
-            break
+            return
+
+
+
 
 
 main()
