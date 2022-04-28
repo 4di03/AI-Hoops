@@ -38,7 +38,7 @@ GEN = 0
 
 class BBox:
     #global bboxes
-    def __init__(self, x, y, height =5, width = 20, passable = False):
+    def __init__(self, x, y, height =5, width = 2, passable = False):
         self.x = x
         self.y = y+2
         self.width = width
@@ -60,17 +60,16 @@ class Rim:
         #left of rim edge
         self.x = x 
         self.y = y
-        leftRim =  BBox(self.x - 10, self.y)
-        rightRim = BBox((self.x + HOOP_SIZE - 10 ), self.y)
-        goal = BBox(leftRim.x + leftRim.width, self.y, height = 5, width = HOOP_SIZE - leftRim.width + 10, passable = True)
-        self.bboxes = [leftRim, rightRim, goal]
+        leftRim =  BBox(self.x , self.y)
+        rightRim = BBox((self.x + HOOP_SIZE) if self.x == 0 else self.x + HOOP_SIZE - 2, self.y)
+        self.goal = BBox(leftRim.x + leftRim.width, self.y, height = 5, width = HOOP_SIZE - leftRim.width, passable = True)
+        self.bboxes = [ self.goal, leftRim, rightRim]
 
 
     def draw(self, win):
-        return    
          
-        # for b in self.bboxes:
-        #   b.draw(win)
+        for b in self.bboxes:
+          b.draw(win)
 
 
 class Ball:
@@ -157,7 +156,8 @@ class Ball:
 
         if self.tick0 % 1 == 0:
 
-            output = nets[i].activate((self.hoop.x - self.x, self.hoop.y - self.y, self.time))
+            output = nets[i].activate((self.hoop.x - self.x, self.hoop.y - self.y, 
+                self.x_vel, dy, self.tick/ALLOWED_TIME))
 
             x = output.index(max(output))
 
@@ -243,7 +243,7 @@ def draw_window(win, balls, testBox = None):
 
 
 
-def main(genomes, config):
+def main(genomes, config, ticks):
     global GEN
     global balls
     
@@ -276,7 +276,7 @@ def main(genomes, config):
         # for bbox in bboxes:
         #     print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
 
-        time.tick(200)
+        time.tick(ticks)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -325,7 +325,7 @@ def main(genomes, config):
 #main()
 
 
-def replay_genome(config_path, genome_path="winner.pkl"):
+def replay_genome(config_path, ticks = 250, genome_path="winner.pkl"):
     # Load requried NEAT config
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
@@ -337,7 +337,7 @@ def replay_genome(config_path, genome_path="winner.pkl"):
     genomes = [(1, genome)]
 
     # Call game with only the loaded genome
-    main(genomes, config)
+    main(genomes, config, ticks)
 
 if __name__ == "__main__":
 
@@ -358,5 +358,4 @@ if __name__ == "__main__":
         pickle.dump(winner, f)
         f.close()
 
-    replay_genome(config_path)
 
