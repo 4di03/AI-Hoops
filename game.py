@@ -36,9 +36,12 @@ font = pygame.font.SysFont('Comic Sans MS', 10)
 
 GEN = 0
 
+BBOX_WIDTH = 10
+BBOX_HEIGHT = 10
+
 class BBox:
     #global bboxes
-    def __init__(self, x, y, height =5, width = 2, passable = False):
+    def __init__(self, x, y, height = BBOX_HEIGHT, width = BBOX_WIDTH, passable = False):
         self.x = x
         self.y = y+2
         self.width = width
@@ -61,7 +64,7 @@ class Rim:
         self.x = x 
         self.y = y
         leftRim =  BBox(self.x , self.y)
-        rightRim = BBox((self.x + HOOP_SIZE) if self.x == 0 else self.x + HOOP_SIZE - 2, self.y)
+        rightRim = BBox((self.x + HOOP_SIZE) if self.x == 0 else self.x + HOOP_SIZE - BBOX_WIDTH, self.y)
         self.goal = BBox(leftRim.x + leftRim.width, self.y, height = 5, width = HOOP_SIZE - leftRim.width, passable = True)
         self.bboxes = [ self.goal, leftRim, rightRim]
 
@@ -154,7 +157,7 @@ class Ball:
         if self.y < -200:
             self.y = -200
 
-        if self.tick0 % 1 == 0:
+        if self.tick0 % 50 == 0:
 
             output = nets[i].activate((self.hoop.x - self.x, self.hoop.y - self.y, 
                 self.x_vel, dy, self.tick/ALLOWED_TIME))
@@ -166,8 +169,9 @@ class Ball:
             elif x == 1:
                 self.jump(False)
 
-    def collide(self, bbox, ge , i):
+    def collide(self, bbox, ge, i):
        col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) 
+       #if horiz: print("lmaessa")
        if col_point != None:
             
            # print("collision with bbox at ", bbox.x ,bbox.y)
@@ -175,28 +179,68 @@ class Ball:
             dy =  self.y_vel * self.time + (self.y_acc) * (self.time ** 2)
 
             if not bbox.passable:
-
-                if abs(dy) > abs(dx):
-                    if dy > 0: 
-                        self.y = bbox.y - BALL_SIZE
-                        self.y_vel *= .65
-                        self.x_vel *= 0.5
-                        self.time = 0
-                    elif dy < 0:
-                        self.y = bbox.y + bbox.height
-                        self.y_vel = 0
-                        self.time = 0
-                elif dy != 0 and dx != 0: 
-                    #print("bruh")
-                    self.x_vel = 0
+                
+                if self.y < bbox.y:
+                    self.y = bbox.y - BALL_SIZE
+                    self.y_vel *= .65
+                    self.x_vel *= 0.5
+                elif self.y >= bbox.y + bbox.height * .8:
+                    #print("burh")
+                    self.y = bbox.y + bbox.height
                     self.y_vel = 0
+                else:
+                    #print(self.y, bbox.y+bbox.height)
+                    self.x_vel *= -1
+                    self.y_vel *= -1
+                    self.x += 10 * self.x_vel
+                    self.y += 10 * self.y_vel    
+
+                self.time = 0
+
+
             elif dy > 0:
                 self.tick = ALLOWED_TIME
                 self.y = bbox.y+bbox.height + 20
                 self.score += 1
-                ge[i].fitness += 10
                 #self.hoop.clear()
+                ge[i].fitness += 10
                 self.hoop = Hoop()
+
+
+            #print(self.x, self.y)
+
+
+    # def collide(self, bbox, ge , i):
+    #    col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) 
+    #    if col_point != None:
+            
+    #        # print("collision with bbox at ", bbox.x ,bbox.y)
+    #         dx = self.x_vel
+    #         dy =  self.y_vel * self.time + (self.y_acc) * (self.time ** 2)
+
+    #         if not bbox.passable:
+
+    #             if abs(dy) > abs(dx):
+    #                 if dy > 0: 
+    #                     self.y = bbox.y - BALL_SIZE
+    #                     self.y_vel *= .65
+    #                     self.x_vel *= 0.5
+    #                     self.time = 0
+    #                 elif dy < 0:
+    #                     self.y = bbox.y + bbox.height
+    #                     self.y_vel = 0
+    #                     self.time = 0
+    #             elif dy != 0 and dx != 0: 
+    #                 #print("bruh")
+    #                 self.x_vel = 0
+    #                 self.y_vel = 0
+    #         elif dy > 0:
+    #             self.tick = ALLOWED_TIME
+    #             self.y = bbox.y+bbox.height + 20
+    #             self.score += 1
+    #             ge[i].fitness += 10
+    #             #self.hoop.clear()
+    #             self.hoop = Hoop()
 
 
            
@@ -243,7 +287,7 @@ def draw_window(win, balls, testBox = None):
 
 
 
-def main(genomes, config, ticks):
+def main(genomes, config, ticks = 250):
     global GEN
     global balls
     
@@ -283,12 +327,12 @@ def main(genomes, config, ticks):
                 pygame.quit()
                 quit()
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
-                    print("restarting")
-                    bboxes = []
-                    balls = []
-                    main()
+           # if event.type == pygame.KEYDOWN:
+                # if event.key == pygame.K_r:
+                #     print("restarting")
+                #     bboxes = []
+                #     balls = []
+                #     main()
 
                 # if event.key == pygame.K_d:
                 #         #print("jump right")
@@ -308,13 +352,6 @@ def main(genomes, config, ticks):
             ball.move(nets, ge , i)
 
             i -= 1
-
-            
-            
-
-
-        
-        
 
         draw_window(win,balls)#,  testBox)
 
