@@ -30,8 +30,6 @@ STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 ALLOWED_TIME = 1200
 
-#bboxes = []
-
 font = pygame.font.SysFont('Comic Sans MS', 10)
 
 GEN = 0
@@ -40,7 +38,6 @@ BBOX_WIDTH = 10
 BBOX_HEIGHT = 10
 
 class BBox:
-    #global bboxes
     def __init__(self, x, y, height = BBOX_HEIGHT, width = BBOX_WIDTH, passable = False):
         self.x = x
         self.y = y+2
@@ -48,7 +45,6 @@ class BBox:
         self.height = height
         self.rect = pygame.Rect((self.x, self.y) , (self.width, self.height))
         self.mask = pygame.mask.Mask((self.width, self.height), True)
-        #bboxes.append(self)
         self.passable = passable
 
 
@@ -104,8 +100,6 @@ class Ball:
         win.blit(BALL_IMG, (self.x, self.y))
         pygame.draw.rect(win,(0, 255, 0), hpBar)
         win.blit(text_surface, (self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2 - 10))
-#        win.blit(text_surface2, (self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2))
-
 
     def jump(self, right):
 
@@ -121,19 +115,14 @@ class Ball:
         self.tick0 += 1
         
         self.tick -= 1
-        ge[i].fitness += .1
+        #ge[i].fitness += .1
 
         if self.tick <= 0:
-            #ge[i].fitness += .1
-            #self.hoop.clear()
+     
             balls.pop(i)
             nets.pop(i)
             ge.pop(i)
             return
-
-
-      
-        
         for bbox in self.hoop.rim.bboxes:
             self.collide(bbox, ge, i)
 
@@ -171,7 +160,6 @@ class Ball:
 
     def collide(self, bbox, ge, i):
        col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) 
-       #if horiz: print("lmaessa")
        if col_point != None:
             
            # print("collision with bbox at ", bbox.x ,bbox.y)
@@ -185,11 +173,9 @@ class Ball:
                     self.y_vel *= .65
                     self.x_vel *= 0.5
                 elif self.y >= bbox.y + bbox.height * .8:
-                    #print("burh")
                     self.y = bbox.y + bbox.height
                     self.y_vel = 0
                 else:
-                    #print(self.y, bbox.y+bbox.height)
                     self.x_vel *= -1
                     self.y_vel *= -1
                     self.x += 10 * self.x_vel
@@ -202,49 +188,8 @@ class Ball:
                 self.tick = ALLOWED_TIME
                 self.y = bbox.y+bbox.height + 20
                 self.score += 1
-                #self.hoop.clear()
-                ge[i].fitness += 10
+                ge[i].fitness += 100
                 self.hoop = Hoop()
-
-
-            #print(self.x, self.y)
-
-
-    # def collide(self, bbox, ge , i):
-    #    col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) 
-    #    if col_point != None:
-            
-    #        # print("collision with bbox at ", bbox.x ,bbox.y)
-    #         dx = self.x_vel
-    #         dy =  self.y_vel * self.time + (self.y_acc) * (self.time ** 2)
-
-    #         if not bbox.passable:
-
-    #             if abs(dy) > abs(dx):
-    #                 if dy > 0: 
-    #                     self.y = bbox.y - BALL_SIZE
-    #                     self.y_vel *= .65
-    #                     self.x_vel *= 0.5
-    #                     self.time = 0
-    #                 elif dy < 0:
-    #                     self.y = bbox.y + bbox.height
-    #                     self.y_vel = 0
-    #                     self.time = 0
-    #             elif dy != 0 and dx != 0: 
-    #                 #print("bruh")
-    #                 self.x_vel = 0
-    #                 self.y_vel = 0
-    #         elif dy > 0:
-    #             self.tick = ALLOWED_TIME
-    #             self.y = bbox.y+bbox.height + 20
-    #             self.score += 1
-    #             ge[i].fitness += 10
-    #             #self.hoop.clear()
-    #             self.hoop = Hoop()
-
-
-           
-
 
 
 class Hoop:
@@ -254,20 +199,12 @@ class Hoop:
         self.y = random.randint(0, WIN_HEIGHT*.75)
         self.img = HOOP_IMG.copy()
         self.img =  self.img if self.x == 0 else pygame.transform.flip(self.img, True, False)
-        #print(self.x, self.y)
         self.rim = Rim(self.x, self.y)
-        #print(self.rim.x, self.rim.y)
 
     def draw(self, win):
 
         win.blit(self.img, (self.x, self.y))
         self.rim.draw(win)
-
-
-
-    def clear(self):
-        for bbox in self.rim.bboxes:
-            bboxes.remove(bbox)
 
 
 
@@ -287,7 +224,7 @@ def draw_window(win, balls, testBox = None):
 
 
 
-def main(genomes, config, ticks = 250):
+def main(genomes, config, ticks = 250, display = False):
     global GEN
     global balls
     
@@ -299,51 +236,26 @@ def main(genomes, config, ticks = 250):
     for genome_id , g in genomes:
         net = neat.nn.FeedForwardNetwork.create(g, config)
         nets.append(net)
-        #balls.append(Ball())
         Ball()
         g.fitness = 0
         ge.append(g)
 
-    win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-    #run = len(balls) > 0
-    time = pygame.time.Clock()
-    # Ball()
-    # Ball()
-    # Ball()
-    #balls = [Ball()]
-    #testBox = BBox(300, 300, 20 ,20)
-    #bboxes = [ground , hoop.rim.bboxes[0], hoop.rim.bboxes[1], testBox]
+    if display:
+        win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+        time = pygame.time.Clock()
+
 
     run = True
     while run:
         global bboxes
-        # for bbox in bboxes:
-        #     print( "bbox at " , bbox.x ,", " ,bbox.y , end = " ")
+        if display: 
+            time.tick(ticks)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+                    pygame.quit()
+                    quit()
 
-        time.tick(ticks)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-                pygame.quit()
-                quit()
-
-           # if event.type == pygame.KEYDOWN:
-                # if event.key == pygame.K_r:
-                #     print("restarting")
-                #     bboxes = []
-                #     balls = []
-                #     main()
-
-                # if event.key == pygame.K_d:
-                #         #print("jump right")
-                #         balls[0].jump(True)
-                # if event.key == pygame.K_a:
-                #         #print("jump left")
-                #         balls[0].jump(False)
-        
-        # print(len(ge))
-        # print(len(balls))
-        # print(len(nets))
         i = len(balls) - 1
         while i >= 0:
 
@@ -353,13 +265,12 @@ def main(genomes, config, ticks = 250):
 
             i -= 1
 
-        draw_window(win,balls)#,  testBox)
+        if display: draw_window(win,balls)#,  testBox)
 
         if len(balls) == 0:
             return
 
 
-#main()
 
 
 def replay_genome(config_path, ticks = 250, genome_path="winner.pkl"):
@@ -374,7 +285,7 @@ def replay_genome(config_path, ticks = 250, genome_path="winner.pkl"):
     genomes = [(1, genome)]
 
     # Call game with only the loaded genome
-    main(genomes, config, ticks)
+    main(genomes, config, ticks, display = True)
 
 if __name__ == "__main__":
 
