@@ -115,7 +115,6 @@ class Ball:
         self.tick0 += 1
         
         self.tick -= 1
-        #ge[i].fitness += .1
 
         if self.tick <= 0:
      
