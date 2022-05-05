@@ -8,8 +8,8 @@ To watch the AI's learn, run game.py
 To play the game for yourself, run gameSP.py, controls are a for jumping left and d for jumping right.
 
 Stats:
-    - AI Current Highscore: 110
-    - Average ~ 50 
+    - AI Current Highscore: 165
+    - Average ~ needs more testing
 
 TODO:
 - fix ground glitch

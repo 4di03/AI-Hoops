@@ -148,7 +148,7 @@ class Ball:
         if self.tick0 % 50 == 0:
 
             output = nets[i].activate((self.hoop.x - self.x, self.hoop.y - self.y, 
-                self.x_vel, dy, self.tick/ALLOWED_TIME))
+                self.x_vel, dy, self.tick/ALLOWED_TIME, self.y+BALL_SIZE > self.hoop.y))
 
             x = output.index(max(output))
 
