@@ -27,7 +27,7 @@ BRAIN_BALL_IMG =  pygame.transform.scale(
     pygame.image.load(os.path.join("assets", "bball_brain.png")), (BALL_SIZE, BALL_SIZE))
 
 BEST_BALL_IMG =  pygame.transform.scale(
-    pygame.image.load(os.path.join("assets", "winner_ball.png")), (BALL_SIZE+10, 30+ BALL_SIZE))
+    pygame.image.load(os.path.join("assets", "winner_ball.png")), (BALL_SIZE, BALL_SIZE))
 
 HOOP_SIZE= 100
 HOOP_IMG = pygame.transform.scale(

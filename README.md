@@ -1,19 +1,16 @@
 # BasketBallAI
 Neural network that learns to play simple basketball game usinge neat genetic algorithm.
 
-To watch the best AI play , run playWinner.py
+Run the game using main.py
 
-To watch the AI's learn, run game.py
 
-To play the game for yourself, run gameSP.py, controls are a for jumping left and d for jumping right.
+Note:
+faster training occurs when graphics are turned off.
 
-Stats:
-    - AI Current Highscore: 165
-    - Average ~ needs more testing
+- AI Current Highscore: 165
 
 TODO:
 - fix ground glitch
-- faster/ more consistent learning
-- make AI get score greater than 1000
 - increase game difficulty
-- GUI and QOL
+- add neat configurability for users
+- allow users to return to menu mid training

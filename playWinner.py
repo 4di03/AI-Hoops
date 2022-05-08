@@ -1,4 +1,4 @@
-from game import replay_genome
+from main import replay_genome
 
 
 config_path = "./config-feedforward.txt"

@@ -13,30 +13,30 @@ from Image import Image, Button
 from Game import Game
 
 
-WIN_WIDTH = 800
-WIN_HEIGHT = 500
+# WIN_WIDTH = 800
+# WIN_HEIGHT = 500
 
-MENU_WIDTH = 750
-MENU_HEIGHT = 600
+# MENU_WIDTH = 750
+# MENU_HEIGHT = 600
 
-BG_IMG = pygame.transform.scale( pygame.image.load(os.path.join("assets", "bg.jpg")), (WIN_WIDTH, WIN_HEIGHT))
+# BG_IMG = pygame.transform.scale( pygame.image.load(os.path.join("assets", "bg.jpg")), (WIN_WIDTH, WIN_HEIGHT))
 
-BALL_SIZE = 50
-BALL_IMG = pygame.transform.scale(
-    pygame.image.load(os.path.join("assets", "ball.png")), (BALL_SIZE, BALL_SIZE))
+# BALL_SIZE = 50
+# BALL_IMG = pygame.transform.scale(
+#     pygame.image.load(os.path.join("assets", "ball.png")), (BALL_SIZE, BALL_SIZE))
 
-BRAIN_BALL_IMG =  pygame.transform.scale(
-    pygame.image.load(os.path.join("assets", "bball_brain.png")), (BALL_SIZE, BALL_SIZE))
+# BRAIN_BALL_IMG =  pygame.transform.scale(
+#     pygame.image.load(os.path.join("assets", "bball_brain.png")), (BALL_SIZE, BALL_SIZE))
 
-BEST_BALL_IMG =  pygame.transform.scale(
-    pygame.image.load(os.path.join("assets", "winner_ball.png")), (BALL_SIZE+10, 30+ BALL_SIZE))
+# BEST_BALL_IMG =  pygame.transform.scale(
+#     pygame.image.load(os.path.join("assets", "winner_ball.png")), (BALL_SIZE,  BALL_SIZE))
 
-STAT_FONT = pygame.font.SysFont("comicsans", 50)
+# STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 
 
-MENU_BG = pygame.transform.scale(
-    pygame.image.load(os.path.join("assets", "menu_bg.png")), (MENU_WIDTH, MENU_HEIGHT))
+# MENU_BG = pygame.transform.scale(
+ #   pygame.image.load(os.path.join("assets", "menu_bg.png")), (MENU_WIDTH, MENU_HEIGHT))
 
 
 
