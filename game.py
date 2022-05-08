@@ -7,18 +7,23 @@ import neat
 import pickle
 from objects import Ball
 from Image import Image, Button
-from objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, MENU_WIDTH, MENU_HEIGHT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG, MENU_BG, BG_IMG, balls
+from objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, MENU_WIDTH, MENU_HEIGHT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG, MENU_BG, BG_IMG
 
 GEN = 0
+font = pygame.font.SysFont('Comic Sans MS', 10)
 
 class Game:
-    
+    config_path = "./config-feedforward.txt"
+
+
     menu_bg_image = Image(MENU_BG, 0, 0 , MENU_WIDTH, MENU_HEIGHT)
     game_bg_image = Image(BG_IMG, 0, 0 , WIN_WIDTH, WIN_HEIGHT)
+
+    balls = []
     
-    def replay_genome(self, config_path,game, ticks = 250, genome_path="winner.pkl"):
+    def replay_genome(self,  ticks = 250, genome_path="winner.pkl"):
         # Load requried NEAT config
-        config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+        config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
 
         # Unpickle saved winner
         with open(genome_path, "rb") as f:
@@ -28,7 +33,7 @@ class Game:
         genomes = [(1, genome)]
 
         # Call game with only the loaded genome
-        game.main(genomes, config, ticks, display = True)
+        self.main(genomes, config, ticks, display = True)
 
 
 
@@ -36,7 +41,7 @@ class Game:
         config_path = "./config-feedforward.txt"
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
-
+        
 
         p = neat.Population(config)
 
@@ -46,11 +51,14 @@ class Game:
         p.add_reporter(stats)
 
         winner = p.run(self.main, 1000)
-        with open("winner.pkl", "wb") as f:
-            pickle.dump(winner, f)
-            f.close()
+
+        if False:
+            with open("winner.pkl", "wb") as f:
+                pickle.dump(winner, f)
+                f.close()
 
     def menu(self, win):
+        self.balls = []
         win = pygame.display.set_mode((MENU_WIDTH, MENU_HEIGHT))
         time = pygame.time.Clock()
 
@@ -79,6 +87,13 @@ class Game:
                         for button in buttons:
                             if button.clicked(pos[0], pos[1]):
                                 button.execute()
+
+
+
+            sp_text = font.render('Play Solo:'+ str(self.score), False, (255, 255, 255))
+
+
+            
             #draw buttons 
             single_player_button.draw(win)
             train_ai_button.draw(win)
@@ -86,24 +101,20 @@ class Game:
 
             pygame.display.update()
 
-    def draw_window(self, win, balls, testBox = None, sp = False):
+    def draw_window(self, win, testBox = None, sp = False):
         self.game_bg_image.draw(win)
 
-        for ball in balls:
+        for ball in self.balls:
             ball.draw(win)
-            #if hoop != None: ball.hoop.draw(win)
 
-        text = STAT_FONT.render("Generation: " + str(GEN), 1, (255, 255, 255))
-        if not sp: win.blit(text, (WIN_WIDTH/2 - text.get_width(), 10))
         if testBox != None: testBox.draw(win)    
         pygame.display.update()
 
     def play_solo(self):
-        global balls
         win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         time = pygame.time.Clock()
         
-        ball = Ball()
+        ball = Ball(self)
 
         run = True
         while run:
@@ -120,38 +131,31 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         print("restarting")
-                        balls = []
-                        self.main()
+                        self.menu(win)
 
                     if event.key == pygame.K_d:
-                            #print("jump right")
-                            balls[0].jump(True)
+                            self.balls[0].jump(True)
                     if event.key == pygame.K_a:
-                            #print("jump left")
-                            balls[0].jump(False)
+                            self.balls[0].jump(False)
 
            
         
-            ball.move(None, None , -1)
+            ball.move(None, None , -1, self)
 
-            self.draw_window(win,balls)#,  testBox)
+            self.draw_window(win)#,  testBox)
+            if len(self.balls) == 0:
+                self.menu(win)
 
-            if len(balls) == 0:
-                return
 
-    def main(self, genomes, config, ticks = 250, display = False):
-        global GEN
-        global balls
 
-        GEN += 1
-
+    def main(self, genomes, config, ticks = 2500, display = False):
         nets = []
         ge = []
 
         for genome_id , g in genomes:
             net = neat.nn.FeedForwardNetwork.create(g, config)
             nets.append(net)
-            Ball()
+            Ball(self)
             g.fitness = 0
             ge.append(g)
 
@@ -170,16 +174,24 @@ class Game:
                         pygame.quit()
                         quit()
 
-            i = len(balls) - 1
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_r:
+                            print("restarting")
+                            self.menu(win)
+
+            i = len(self.balls) - 1
             while i >= 0:
 
-                ball = balls[i]
+                ball = self.balls[i]
 
-                ball.move(nets, ge , i)
+                ball.move(nets, ge , i, self)
 
                 i -= 1
 
-            if display: self.draw_window(win,balls)#,  testBox)
+            if display: self.draw_window(win)#,  testBox)
+            
 
-            if len(balls) == 0:
-                return
+            if len(self.balls) == 0:
+                self.menu(win)
+
+        self.menu(win)

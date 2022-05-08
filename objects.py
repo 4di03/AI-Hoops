@@ -10,8 +10,6 @@ import neat
 import pickle
 from Image import Image, Button
 
-balls = []
-
 
 WIN_WIDTH = 800
 WIN_HEIGHT = 500
@@ -86,9 +84,7 @@ class Rim:
 
 
 class Ball:
-    global balls
-    global ground
-    def __init__(self):
+    def __init__(self, game):
         self.x = (WIN_WIDTH/2) - BALL_SIZE
         self.y = (WIN_HEIGHT/2) - BALL_SIZE
         self.x_vel = 0
@@ -99,7 +95,7 @@ class Ball:
         self.mask = pygame.mask.from_surface(BALL_IMG)
         self.score = 0
         self.tick = ALLOWED_TIME
-        balls.append(self)
+        game.balls.append(self)
         self.tick0 = 0
         self.img = Image(BALL_IMG, self.x, self.y, BALL_SIZE, BALL_SIZE)
 
@@ -123,14 +119,14 @@ class Ball:
         self.y_vel = -1.3
         self.time = 0
 
-    def move(self, nets , ge ,i):
+    def move(self, nets , ge ,i,game):
         self.tick0 += 1
         
         self.tick -= 1
 
         if self.tick <= 0:
      
-            balls.pop(i)
+            game.balls.pop(i)
 
             if nets and ge:
                 nets.pop(i)
