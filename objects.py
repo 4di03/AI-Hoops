@@ -75,12 +75,14 @@ class Rim:
         rightRim = BBox((self.x + HOOP_SIZE) if self.x == 0 else self.x + HOOP_SIZE - BBOX_WIDTH, self.y)
         self.goal = BBox(leftRim.x + leftRim.width, self.y, height = 5, width = HOOP_SIZE - leftRim.width, passable = True)
         self.bboxes = [ self.goal, leftRim, rightRim]
+        self.drawable = False
 
 
     def draw(self, win):
-         
-        for b in self.bboxes:
-          b.draw(win)
+        
+        if self.drawable:
+            for b in self.bboxes:
+                b.draw(win)
 
 
 class Ball:

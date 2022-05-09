@@ -19,6 +19,8 @@ NO_IMG =  pygame.transform.scale(
 
 GEN = 0
 font = pygame.font.SysFont('Comic Sans MS', 13)
+big_font = pygame.font.SysFont('Comic Sans MS', 15)
+
 
 
 
@@ -29,9 +31,12 @@ class Game:
     menu_bg_image = Image(MENU_BG, 0, 0 , MENU_WIDTH, MENU_HEIGHT)
     game_bg_image = Image(BG_IMG, 0, 0 , WIN_WIDTH, WIN_HEIGHT)
 
-    balls = []
-
-    show_display_options = False
+    def __init__(self):
+        pygame.display.set_caption('AI Hoops')
+        self.balls = []
+        self.show_display_options = False
+        win = None
+        self.menu(win)
     
     def replay_genome(self,  ticks = 250, genome_path="winner.pkl"):
         # Load requried NEAT config
@@ -45,7 +50,7 @@ class Game:
         genomes = [(1, genome)]
 
         # Call game with only the loaded genome
-        self.main(genomes, config, ticks, display = True)
+        self.main(genomes, config, ticks, display = True, quit = True)
     
 
     def show_train(self):
@@ -130,11 +135,11 @@ class Game:
 
             sp_text = font.render('Play Solo:', False, BLACK)
 
-            ai_text = font.render('Watch the AI Learn:', False, BLACK)
+            ai_text = font.render('Train the AI:', False, BLACK)
 
             pw_text = font.render('Watch the Best AI play:', False, BLACK)
             
-            quit_text = font.render('Press r anytime to return to menu', False, BLACK)
+            quit_text = big_font.render('Press r anytime to return to menu', False, BLACK)
 
             #draw buttons 
             single_player_button.draw(win)
@@ -186,7 +191,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         print("restarting")
-                        self.menu(win)
+                        self.__init__()
 
                     if event.key == pygame.K_d:
                             self.balls[0].jump(True)
@@ -199,11 +204,11 @@ class Game:
 
             self.draw_window(win)#,  testBox)
             if len(self.balls) == 0:
-                self.menu(win)
+                self.__init__()
 
 
 
-    def main(self, genomes, config, ticks = 2500, display = False):
+    def main(self, genomes, config, ticks = 250, display = False, quit = False):
         nets = []
         ge = []
 
@@ -232,7 +237,7 @@ class Game:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_r and display:
                             print("restarting")
-                            self.menu(win)
+                            self.__init__()
 
             i = len(self.balls) - 1
             while i >= 0:
@@ -247,6 +252,8 @@ class Game:
             
 
             if len(self.balls) == 0:
-                return
+                if quit:self.__init__()
+                else:
+                    return
 
         #self.menu(win)
