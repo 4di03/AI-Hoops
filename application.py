@@ -24,6 +24,8 @@ from flask import Flask, render_template, url_for, copy_current_request_context
 from random import random
 from time import sleep
 from threading import Thread, Event
+from model.Game import Game
+from model.objects import WIN_HEIGHT, WIN_WIDTH
 
 __author__ = 'slynn'
 
@@ -47,8 +49,8 @@ def randomNumberGenerator():
     print("Making random numbers")
     while not thread_stop_event.isSet():
         number = round(random()*10, 3)
-        print(number)
-        socketio.emit('newnumber', {'number': number}, namespace='/test')
+        print("number:" + str(number))
+        socketio.emit('newnumber', {'number': number}, namespace='/menu')
         socketio.sleep(2)
 
 
@@ -57,7 +59,22 @@ def index():
     #only by sending this page first will the client be connected to the socketio instance
     return render_template('index.html')
 
-@socketio.on('connect', namespace='/test')
+
+@app.route('/game/')
+def game():
+    socketio.emit('dimensions', [WIN_WIDTH, WIN_HEIGHT])
+    #only by sending this page first will the client be connected to the socketio instance
+    return render_template('canvas.html')
+
+
+
+@socketio.on('message', namespace='/menu')
+def handle_message(data):
+    print('received message: ' + data)
+    socketio.emit('newnumber', {'number': 420}, namespace='/menu')
+
+
+@socketio.on('connect', namespace='/menu')
 def test_connect():
     # need visibility of the global thread object
     global thread
@@ -68,7 +85,27 @@ def test_connect():
         print("Starting Thread")
         thread = socketio.start_background_task(randomNumberGenerator)
 
-@socketio.on('disconnect', namespace='/test')
+
+
+
+@socketio.on('mode')
+def prompt_mode(mode):
+    #choose the gamemode for the game
+
+
+    game = Game()
+
+    if mode == "solo":
+        game.play_solo(socketio)
+        pass
+    elif mode == "train":
+        game.train_AI(socketio)
+        pass
+    elif mode == "winner":
+        game.replay_genome(socketio)
+        pass
+
+@socketio.on('disconnect', namespace='/menu')
 def test_disconnect():
     print('Client disconnected')
 
