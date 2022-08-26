@@ -62,7 +62,6 @@ def index():
 
 @app.route('/game/')
 def game():
-    socketio.emit('dimensions', [WIN_WIDTH, WIN_HEIGHT])
     #only by sending this page first will the client be connected to the socketio instance
     return render_template('canvas.html')
 
@@ -82,16 +81,16 @@ def test_connect():
 
     #Start the random number generator thread only if the thread has not been started before.
     if not thread.is_alive():
-        print("Starting Thread")
-        thread = socketio.start_background_task(randomNumberGenerator)
+        print("Not Starting Thread")
+        #thread = socketio.start_background_task(randomNumberGenerator)
 
 
 
 
-@socketio.on('mode')
+@socketio.on('mode', namespace = '/menu')
 def prompt_mode(mode):
     #choose the gamemode for the game
-
+    socketio.emit('dimensions', [WIN_WIDTH, WIN_HEIGHT])
 
     game = Game()
 

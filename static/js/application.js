@@ -57,6 +57,7 @@ $(document).ready(function(){
     solo_btn.addEventListener('click', event =>{
 
         socket.emit('mode', 'solo');
+        
         openCanvas();
     });
 

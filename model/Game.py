@@ -24,6 +24,7 @@ class Game:
         self.balls = []
         self.images = []
         self.show_display_options = False
+        os.environ["SDL_VIDEODRIVER"] = "dummy"
     
     def replay_genome(self,  socket, ticks = 250, genome_path="winner.pkl"):
         # Load requried NEAT config
@@ -84,7 +85,6 @@ class Game:
         ball = Ball(self)
 
         run = True
-        images = []
         while run:
             global bboxes
 
@@ -125,11 +125,11 @@ class Game:
             ball.move(None, None , -1, self)
 
             images_clone = []
-            for image in images:
-                images_clone.appen(image.to_list())
+            for image in self.images:
+                images_clone.append(image.to_list())
 
             
-            socket.emit("screen",json.dumps(images))
+            socket.emit("screen",json.dumps(images_clone))
 
 
             if len(self.balls) == 0:
