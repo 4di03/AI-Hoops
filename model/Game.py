@@ -1,4 +1,5 @@
 from lib2to3.pytree import generate_matches
+from socket import socketpair
 from tkinter.messagebox import YES
 import pygame
 import time
@@ -78,6 +79,15 @@ class Game:
     #     if testBox != None: testBox.draw(win)    
     #     pygame.display.update()
 
+    def emit_data(self,name, socket):
+
+        balls_data = []
+        for ball in self.balls:
+            balls_data.append(ball.get_data())
+
+        
+        socket.emit(name,json.dumps(balls_data))
+
     def play_solo(self, socket):
         win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         time = pygame.time.Clock()
@@ -120,16 +130,12 @@ class Game:
             #         if event.key == pygame.K_a:
             #                 self.balls[0].jump(False)
 
-           
-        
             ball.move(None, None , -1, self)
 
-            images_clone = []
-            for image in self.images:
-                images_clone.append(image.to_list())
+        
+     
 
-            
-            socket.emit("screen",json.dumps(images_clone))
+            self.emit_data("screen", socket)
 
 
             if len(self.balls) == 0:

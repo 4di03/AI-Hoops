@@ -9,6 +9,7 @@ pygame.font.init()
 import neat
 import pickle
 from model.Image import Image, Button
+import json
 
 
 WIN_WIDTH = 800
@@ -87,7 +88,7 @@ class Ball:
         self.x_vel = 0
         self.y_vel = 0
         self.y_acc = 0.1
-        self.hoop = Hoop()
+        self.hoop = Hoop(game)
         self.time = 0
         self.mask = pygame.mask.from_surface(BALL_IMG)
         self.score = 0
@@ -205,15 +206,29 @@ class Ball:
                 self.hoop = Hoop()
 
 
+    def get_data(self):
+
+        data = {"images":[], "text": [], "rectangles":[]}
+
+        data["images"].append(self.img.to_list())
+        data["images"].append(self.hoop.img.to_list())
+        data["text"].append([(self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2 - 10),"Score: " + str(self.score), (255,255,255),"12px Arial"])
+        data["rectangles"].append([(self.x, self.y -20) , (BALL_SIZE * (self.tick/ALLOWED_TIME), 15), "green"])
+
+        
+        return data
+
+
 class Hoop:
     #global bboxes
-    def __init__(self):
+    def __init__(self, game):
         self.x = random.randint(0,1) * (WIN_WIDTH - HOOP_SIZE)
         self.y = random.randint(0, WIN_HEIGHT*.75)
         self.img_copy = HOOP_IMG.copy()    
         self.img= Image((self.img_copy if self.x == 0 else pygame.transform.flip(self.img_copy, True, False)), 
             self.x, self.y, HOOP_SIZE, HOOP_SIZE,"static/assets/hoop2.png" )
         self.rim = Rim(self.x, self.y)
+        game.images.append(self.img)
 
     def draw(self, win):
 

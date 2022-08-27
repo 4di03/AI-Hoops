@@ -26,12 +26,16 @@ from time import sleep
 from threading import Thread, Event
 from model.Game import Game
 from model.objects import WIN_HEIGHT, WIN_WIDTH
+import json
 
 __author__ = 'slynn'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
+
+
+game_mode= "solo"
 
 #turn the flask app into a socketio app
 socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
@@ -85,22 +89,29 @@ def test_connect():
         #thread = socketio.start_background_task(randomNumberGenerator)
 
 
+@socketio.on('recieve_mode', namespace='/menu')
+def recieve_mode(mode):
+    global game_mode 
 
 
-@socketio.on('mode', namespace = '/menu')
-def prompt_mode(mode):
+    game_mode = mode
+
+@socketio.on('start')
+def prompt_mode(waste):
     #choose the gamemode for the game
-    socketio.emit('dimensions', [WIN_WIDTH, WIN_HEIGHT])
+    socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]))
 
     game = Game()
 
-    if mode == "solo":
+    print("GAME STARTED")
+
+    if game_mode == "solo":
         game.play_solo(socketio)
         pass
-    elif mode == "train":
+    elif game_mode == "train":
         game.train_AI(socketio)
         pass
-    elif mode == "winner":
+    elif game_mode == "winner":
         game.replay_genome(socketio)
         pass
 

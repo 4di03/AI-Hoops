@@ -1,10 +1,10 @@
 // import {Solo, Train, Winner} from "./modes.js";
 
-function openCanvas(){
+function openCanvas(mode, socket){
 
     // alert(mode.constructor.name)
     // sessionStorage.setItem('mode', JSON.stringify(mode));
-
+    socket.emit("recieve_mode", mode)
     window.location.replace('game');
 
 }
@@ -56,24 +56,21 @@ $(document).ready(function(){
 
     solo_btn.addEventListener('click', event =>{
 
-        socket.emit('mode', 'solo');
         
-        openCanvas();
+        openCanvas('solo', socket);
     });
 
 
     train_btn.addEventListener('click', event =>{
 
-        socket.emit('mode', 'train');
-        openCanvas();
+        openCanvas('train', socket);
     });
 
 
     winner_btn.addEventListener('click', event =>{
 
 
-        socket.emit('mode', 'winner');
-        openCanvas();
+        openCanvas('winner', socket);
     });
 
 
