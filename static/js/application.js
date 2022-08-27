@@ -14,7 +14,7 @@ function openCanvas(mode, socket){
 
 $(document).ready(function(){
     //connect to the socket server.
-    var socket = io.connect('http://' + document.domain + ':' + location.port + '/menu');
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
     var numbers_received = [];
 
     //receive details from server
@@ -37,14 +37,7 @@ $(document).ready(function(){
         //write other things
     });
 
-    document.addEventListener('keydown', function(event) {
-        if(event.key == "a") {
-           socket.send("left was pressed");
-        }
-        else if(event.key == "d") {
-            socket.send("right was pressed");
-        }
-    });
+
 
 
     let solo_btn = document.getElementById("solo-btn");

@@ -12,6 +12,7 @@ from model.objects import Ball
 from model.Image import Image, Button
 from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG
 import json 
+import socketio
 
 
 
@@ -99,10 +100,13 @@ class Game:
             global bboxes
 
 
-            time.tick(250)
+            time.tick(200)
 
-      
+
+
+            @socket.on('input')
             def make_move(input):
+                print("GOT KETYPRESS");
                 if input == "right":
                     self.balls[0].jump(True)
                 elif input == "left":
@@ -112,7 +116,7 @@ class Game:
                     pygame.quit()
                     quit()
 
-            socket.on('input', make_move)
+            # socket.on('input', make_move)
                 
             # for event in pygame.event.get():
             #     if event.type == pygame.QUIT:

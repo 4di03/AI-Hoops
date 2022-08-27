@@ -54,7 +54,7 @@ def randomNumberGenerator():
     while not thread_stop_event.isSet():
         number = round(random()*10, 3)
         print("number:" + str(number))
-        socketio.emit('newnumber', {'number': number}, namespace='/menu')
+        socketio.emit('newnumber', {'number': number})
         socketio.sleep(2)
 
 
@@ -71,13 +71,13 @@ def game():
 
 
 
-@socketio.on('message', namespace='/menu')
+@socketio.on('message')
 def handle_message(data):
     print('received message: ' + data)
-    socketio.emit('newnumber', {'number': 420}, namespace='/menu')
+    socketio.emit('newnumber', {'number': 420})
 
 
-@socketio.on('connect', namespace='/menu')
+@socketio.on('connect')
 def test_connect():
     # need visibility of the global thread object
     global thread
@@ -89,7 +89,7 @@ def test_connect():
         #thread = socketio.start_background_task(randomNumberGenerator)
 
 
-@socketio.on('recieve_mode', namespace='/menu')
+@socketio.on('recieve_mode')
 def recieve_mode(mode):
     global game_mode 
 
@@ -115,7 +115,7 @@ def prompt_mode(waste):
         game.replay_genome(socketio)
         pass
 
-@socketio.on('disconnect', namespace='/menu')
+@socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected')
 

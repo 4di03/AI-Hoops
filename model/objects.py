@@ -97,6 +97,7 @@ class Ball:
         self.tick0 = 0
         self.img = Image(BALL_IMG, self.x, self.y, BALL_SIZE, BALL_SIZE, "static/assets/ball.png")
         game.images.append(self.img)
+        self.game = game
 
 
     def draw(self, win):
@@ -203,7 +204,7 @@ class Ball:
                 self.score += 1
                 if ge:
                     ge[i].fitness += 100
-                self.hoop = Hoop()
+                self.hoop = Hoop(self.game)
 
 
     def get_data(self):

@@ -19,7 +19,6 @@ $(document).ready(function(){
     socket.emit('start', "");
 
     socket.on('dimensions', function(msg){
-        console.log('dimensions recieved :' + msg);
         dims = JSON.parse(msg);
         gameWidth = dims[0];
         gameHeight = dims[1];
@@ -56,13 +55,11 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
             ${color[2]})`;
 
         ctx.font = font;
-        ctx.fillText(text,x,y)
+        ctx.fillText(words,x,y)
         
     } else if (rectColor != null){
         
-        ctx.fillStyle = `rgb(${rectColor[0]},
-            ${rectColor[1]},
-            ${rectColor[2]})`;
+        ctx.fillStyle = rectColor;
 
         ctx.fillRect(x,y,width,height)
 
@@ -86,12 +83,14 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
             for (j = 0; j < images.length; j++){
                 image = images[j];
-                let width = image[-2];
-                let height = image[-1];
+                // console.log(image)
+                let width = image[3];
+                let height = image[4];
                 let x = image[1];
                 let y = image[2];
                 let src = "../" + image[0];
                 
+                // console.log(width)
 
                 if (!imageMap.has(src)){
                     let img = new Image(width, height);
@@ -105,7 +104,6 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
                 }
 
                 drawScaled(x,y, ctx, width,height,imageMap.get(src))
-                console.log(`drew image at ${x} ${y} with width: ${width} , height: ${height} `)
             }
 
             texts = object["text"];
@@ -116,8 +114,8 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
                 pos = text[0]
                 word = text[1];
                 color = text[2];
-                font = text[3];
-
+                font = (0.0125*canvas.height).toString() +"px Arial";
+                console.log(font)
                 drawScaled(pos[0], pos[1], ctx, null, null, null, [word, font, color])
             }
 
@@ -126,10 +124,12 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
             for( j = 0; j<rects.length ; j++){
                 rect = rects[j];
-                
+                console.log(rect)
                 pos = rect[0];
                 dim = rect[1];
-                color = rect[3]
+                color = rect[2]
+                console.log(color)
+                
 
                 drawScaled(pos[0], pos[1], ctx, dim[0], dim[1], null,null, color)
             }
@@ -147,5 +147,15 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
 
     socket.on('screen', updateCanvas);
+
+    document.addEventListener('keydown', function(event) {
+        console.log("KEYDOWN");
+        if(event.key == "a") {
+           socket.emit("input", "left");
+        }
+        else if(event.key == "d") {
+            socket.emit("input", "right");
+        }
+    });
 
 });
