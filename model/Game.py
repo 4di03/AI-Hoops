@@ -90,60 +90,42 @@ class Game:
         socket.emit(name,json.dumps(balls_data))
 
     def play_solo(self, socket):
-        win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         time = pygame.time.Clock()
         
         ball = Ball(self)
 
-        run = True
+        run = len(self.balls)
         while run:
             global bboxes
 
 
-            time.tick(200)
-
-
-
+            time.tick(300)
+            if len(self.balls) == 0:
+                continue
+            
             @socket.on('input')
             def make_move(input):
-                print("GOT KETYPRESS");
-                if input == "right":
-                    self.balls[0].jump(True)
-                elif input == "left":
-                    self.balls[0].jump(False)
+                print("GOT KEYPRESS");
+                if input == "right" and len(self.balls) > 0:
+                    ball.jump(True)
+                elif input == "left" and len(self.balls) > 0:
+                    ball.jump(False)
                 elif input == "quit":
-                    run = False
-                    pygame.quit()
-                    quit()
+                    print("RECIVED MESSAGE: " + input )
+                    self.balls = []
 
-            # socket.on('input', make_move)
-                
-            # for event in pygame.event.get():
-            #     if event.type == pygame.QUIT:
-            #         run = False
-            #         pygame.quit()
-            #         quit()
 
-            #     if event.type == pygame.KEYDOWN:
-            #         if event.key == pygame.K_r:
-            #             print("restarting")
-            #             self.__init__()
+                    
 
-            #         if event.key == pygame.K_d:
-            #                 self.balls[0].jump(True)
-            #         if event.key == pygame.K_a:
-            #                 self.balls[0].jump(False)
+            if not run or len(self.balls) == 0:
+                break
 
-            ball.move(None, None , -1, self)
-
-        
-     
-
+            for ball in self.balls:
+                ball.move(None, None , -1, self)
             self.emit_data("screen", socket)
 
 
-            if len(self.balls) == 0:
-                self.__init__()
+     
 
 
 

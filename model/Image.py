@@ -7,6 +7,7 @@ class Image:
         self.width = width
         self.height = height
         self.src = src
+        self.reversed = False
 
 
     def draw(self, win):
@@ -17,7 +18,7 @@ class Image:
         self.y = y
 
     def to_list(self):
-        return [self.src, self.x, self.y, self.width,self.height]
+        return [self.src, self.x, self.y, self.width,self.height, self.reversed]
 
 
 

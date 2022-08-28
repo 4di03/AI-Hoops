@@ -27,18 +27,19 @@ from threading import Thread, Event
 from model.Game import Game
 from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
-
+import psutil
+import os
 __author__ = 'slynn'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 
 
 game_mode= "solo"
 
 #turn the flask app into a socketio app
-socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
+socketio = SocketIO(app, async_mode=None, logger=False, engineio_logger=False)
 
 #random number Generator Thread
 thread = Thread()
@@ -74,7 +75,9 @@ def game():
 @socketio.on('message')
 def handle_message(data):
     print('received message: ' + data)
-    socketio.emit('newnumber', {'number': 420})
+
+
+
 
 
 @socketio.on('connect')
@@ -107,13 +110,11 @@ def prompt_mode(waste):
 
     if game_mode == "solo":
         game.play_solo(socketio)
-        pass
     elif game_mode == "train":
         game.train_AI(socketio)
-        pass
     elif game_mode == "winner":
         game.replay_genome(socketio)
-        pass
+
 
 @socketio.on('disconnect')
 def test_disconnect():

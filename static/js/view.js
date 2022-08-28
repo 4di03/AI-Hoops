@@ -1,8 +1,5 @@
 
-
 var imageMap = new Map();
-
-
 
 
 
@@ -11,12 +8,31 @@ $(document).ready(function(){
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext('2d');
 
+    
+    //The rectangle should have x,y,width,height properties
+    var rect = {
+        x:canvas.width *.025,
+        y:canvas.height*.025,
+        width:100,
+        height:50
+    };
+
+
     var gameWidth = null;
     var gameHeight = null;
+
+
+    //to quit any previous games
+    socket.emit("input", "quit");
 
     mode = window.location.href.split('#')[-1]
 
     socket.emit('start', "");
+
+    var start = new Date();
+
+   
+
 
     socket.on('dimensions', function(msg){
         dims = JSON.parse(msg);
@@ -42,6 +58,8 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
     if (image != null){
 
+
+
     ctx.drawImage(image, x, y, width, height);
 
 
@@ -64,12 +82,30 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
         ctx.fillRect(x,y,width,height)
 
     }
-}
-
+    }
+    var messagesRecieved = 0
 
     // alert(gameWidth, gameHeight);
+
+    
+    function drawQuitButton(rect){
+
+    
+        ctx.fillStyle = "red";
+    
+        ctx.fillRect(rect.x,rect.y, rect.width,rect.height);
+        ctx.fillStyle = 'white';
+        ctx.fillText("(M) Menu", rect.x, rect.y + 30, rect.width)
+    }
     
     function updateCanvas(objects){
+
+        messagesRecieved += 1
+        let secondsElapsed = (new Date() - start)/1000;
+
+
+
+
 
         ctx.canvas.width  = window.innerWidth;
         ctx.canvas.height = window.innerHeight;
@@ -88,7 +124,17 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
                 let height = image[4];
                 let x = image[1];
                 let y = image[2];
-                let src = "../" + image[0];
+                let isReversed = image[5];
+                let img_path = image[0]
+                let src=  "";
+                if (isReversed){
+                    img_split=  img_path.split("/")
+                    imgName = img_split.pop()
+                    img_path = img_split.join("/") + "/reverse_"+imgName;
+             
+                }
+                src = "../" + img_path;
+
                 
                 // console.log(width)
 
@@ -115,7 +161,6 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
                 word = text[1];
                 color = text[2];
                 font = (0.0125*canvas.height).toString() +"px Arial";
-                console.log(font)
                 drawScaled(pos[0], pos[1], ctx, null, null, null, [word, font, color])
             }
 
@@ -123,21 +168,27 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
             rects = object["rectangles"];
 
             for( j = 0; j<rects.length ; j++){
-                rect = rects[j];
-                console.log(rect)
-                pos = rect[0];
-                dim = rect[1];
-                color = rect[2]
-                console.log(color)
+                rectangle = rects[j];
+                pos = rectangle[0];
+                dim = rectangle[1];
+                color = rectangle[2]
                 
 
                 drawScaled(pos[0], pos[1], ctx, dim[0], dim[1], null,null, color)
             }
+            
+            ctx.font = "30px Bold Arial";
+            ctx.fillStyle = "white";
+            ctx.fillText("Average messages recieveed per sec:" + (messagesRecieved/secondsElapsed).toString() , canvas.width*.6, canvas.height*.1)
 
 
 
 
         }
+
+
+
+        drawQuitButton(rect)
         
 
 
@@ -149,13 +200,47 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
     socket.on('screen', updateCanvas);
 
     document.addEventListener('keydown', function(event) {
-        console.log("KEYDOWN");
         if(event.key == "a") {
            socket.emit("input", "left");
         }
         else if(event.key == "d") {
             socket.emit("input", "right");
+        } else if (event.key == "m"){
+
+            returnToMenu()
         }
     });
+    
 
+
+        //Function to get the mouse position
+    function getMousePos(canvas, event) {
+        return {
+            x: event.clientX,
+            y: event.clientY 
+        };
+    }
+
+    function returnToMenu(){
+        console.log("returning to menu")
+
+        socket.emit('input', "quit")
+
+
+        
+        setTimeout(window.location.replace("/"));
+    }
+    //Function to check whether a point is inside a rectangle
+    function isInside(pos, rect){
+        console.log(pos,rect)
+        return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.height && pos.y > rect.y
+    }
+
+    //Binding the click event on the canvas
+    document.addEventListener('click', function(evt) {
+        var mousePos = getMousePos(canvas, evt);
+        if (isInside(mousePos,rect)) {
+            returnToMenu()
+        }
+    }, false);
 });

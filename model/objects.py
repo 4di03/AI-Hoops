@@ -1,6 +1,7 @@
 #from grpc import xds_server_credentials
 # from inspect import GEN_CLOSED
 # from ipaddress import _IPAddressBase
+from operator import truediv
 import pygame
 import time
 import os
@@ -226,8 +227,13 @@ class Hoop:
         self.x = random.randint(0,1) * (WIN_WIDTH - HOOP_SIZE)
         self.y = random.randint(0, WIN_HEIGHT*.75)
         self.img_copy = HOOP_IMG.copy()    
-        self.img= Image((self.img_copy if self.x == 0 else pygame.transform.flip(self.img_copy, True, False)), 
-            self.x, self.y, HOOP_SIZE, HOOP_SIZE,"static/assets/hoop2.png" )
+
+        if self.x == 0:
+            self.img= Image(self.img_copy, self.x, self.y, HOOP_SIZE, HOOP_SIZE,"static/assets/hoop2.png")
+        else: 
+            self.img = Image(pygame.transform.flip(self.img_copy, True, False), self.x, self.y, HOOP_SIZE, HOOP_SIZE,"static/assets/hoop2.png")
+            self.img.reversed = True
+        
         self.rim = Rim(self.x, self.y)
         game.images.append(self.img)
 
