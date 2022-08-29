@@ -74,6 +74,10 @@ def game():
     return render_template('canvas.html')
 
 
+@app.route('/train/')
+def train_menu():
+    return render_template('train.html')
+
 
 @socketio.on('message')
 def handle_message(data):
@@ -101,6 +105,8 @@ def recieve_mode(mode):
 
     print("GOT MODE: " + mode)
     game_mode = mode
+
+    socketio.emit("got game", "")
 
 @socketio.on('start')
 def prompt_mode(waste):

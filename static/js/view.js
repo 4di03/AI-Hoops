@@ -8,15 +8,6 @@ $(document).ready(function(){
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext('2d');
 
-    
-    //The rectangle should have x,y,width,height properties
-    var rect = {
-        x:canvas.width *.025,
-        y:canvas.height*.025,
-        width:100,
-        height:50
-    };
-
 
     var gameWidth = null;
     var gameHeight = null;
@@ -184,6 +175,17 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
         }
 
+            
+        
+        //The rectangle should have x,y,width,height properties
+        var rect = {
+            x:canvas.width *.45,
+            y:canvas.height*.025,
+            width:100,
+            height:50
+        };
+
+
 
 
         drawQuitButton(rect)
@@ -237,6 +239,15 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
     //Binding the click event on the canvas
     document.addEventListener('click', function(evt) {
         var mousePos = getMousePos(canvas, evt);
+
+            
+        //The rectangle should have x,y,width,height properties
+        var rect = {
+            x:canvas.width *.45,
+            y:canvas.height*.025,
+            width:100,
+            height:50
+        };
         if (isInside(mousePos,rect)) {
             returnToMenu()
         }

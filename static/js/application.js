@@ -18,11 +18,25 @@ function openCanvas(mode, socket){
     // sessionStorage.setItem('mode', JSON.stringify(mode));
     socket.emit("recieve_mode", mode)
     loadGame()
-    setTimeout(
-        function(){     
-        window.location.replace('game')
-    }, 1000);
 
+    //waiting for confirmation that mode was recieved
+    socket.on("got game", function(msg) {
+        setTimeout(
+            function(){
+                window.location.replace('game');
+            }, 1000
+
+        );
+
+    });
+
+}
+
+function openTrainSettings(mode, socket){
+
+
+
+    window.location.replace("train")
 }
 
 
@@ -72,7 +86,7 @@ $(document).ready(function(){
 
     train_btn.addEventListener('click', event =>{
 
-        openCanvas('train', socket);
+        openTrainSettings('train', socket);
     });
 
 

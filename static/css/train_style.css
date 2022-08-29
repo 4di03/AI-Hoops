@@ -1,0 +1,102 @@
+@font-face {
+    font-family: "1982";
+    src: URL("../fonts/BACKTO1982.TTF") format("truetype");
+  }
+  .title {
+    color:orange;
+    -webkit-animation: bounceInLeft;
+            animation: bounceInLeft; /* referring directly to the animation's @keyframe declaration */
+    -webkit-animation-duration: 2s;
+            animation-duration: 2s; /* don't forget to set a duration! */
+    text-align: center;
+    font-family: "1982";
+    font-size: 70px;
+    vertical-align: top;
+    margin:auto;
+    
+  }
+  
+  html {
+    height: 100%;
+    display:block;
+  }
+  
+  body {
+    /* position: relative; */
+    background: #7C75CA;
+    perspective: 500px;
+  }
+
+
+  @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+.range input{
+	-webkit-appearance:none;
+	width:90%;
+	height:4px;
+	border-radius:5px;
+	background-color:#ba3950;
+	outline:none;
+}
+.range input::-webkit-slider-thumb{
+	-webkit-appearance:none;
+	width:20px;
+	height:20px;
+	border-radius:50%;
+	background-color:#a83348;
+}
+.range span{
+	position:absolute;
+	margin-left:14px;
+	width:5%;
+	height:30px;
+	background-color:#222;
+	color:#fff;
+	border-radius:3px;
+	text-align:center;
+	line-height:30px;
+    font-size: 12px;
+}
+.range span:before{
+	content:'';
+	position:absolute;
+	border-right:9px solid transparent;
+	border-left:9px solid transparent;
+	border-bottom:12px solid #222;
+	left:-10px;
+	top:50%;
+	transform:translateY(-50%) rotate(-90deg);
+}
+
+.form{
+    text-align: left;
+    float:left;
+    width:50%;
+} 
+
+li{
+    display:inline-block;
+    width:100%;
+    font-family: Verdana;
+    font-size: 20px;
+    color:  rgb(193, 193, 209)
+
+}
+
+li .range{
+    float:right;
+
+}
+
+.range{
+    width: 60%;
+    margin-bottom: 10px;
+}
+
+main {
+    width:100%;
+}
+
+.container{
+    display: block;
+}
