@@ -13,13 +13,15 @@ from model.Image import Image, Button
 from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG
 import json 
 import socketio
+import sys
 
 
 
 GEN = 0
+socket = None
 
 class Game:
-    config_path = "./config-feedforward.txt"
+    config_path = "./model/config-feedforward.txt"
 
 
     def __init__(self):
@@ -27,8 +29,9 @@ class Game:
         self.images = []
         self.show_display_options = False
         os.environ["SDL_VIDEODRIVER"] = "dummy"
+        self.kill = False
     
-    def replay_genome(self,  socket, ticks = 250, genome_path="winner.pkl"):
+    def replay_genome(self,  socket, ticks = 250, genome_path="model/winner.pkl"):
         # Load requried NEAT config
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
 
@@ -40,7 +43,9 @@ class Game:
         genomes = [(1, genome)]
 
         # Call game with only the loaded genome
-        self.main(genomes, config, ticks,socket, display = True, quit = True)
+        self.main(genomes, config, ticks,socket)
+
+
     
 
     def show_train(self):
@@ -50,10 +55,14 @@ class Game:
         self.main(genomes,config,display= True)
 
 
-    def train_AI(self, socket, display = False):
-        config_path = "./config-feedforward.txt"
+    def train_AI(self, socketio, display = False):
+        global socket
+
+        socket= socketio
+
+        self.config_path = "./model/config-feedforward.txt"
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
-            neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+            neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
         
 
         p = neat.Population(config)
@@ -63,75 +72,42 @@ class Game:
         stats = neat.StatisticsReporter()
         p.add_reporter(stats)
 
-        winner = p.run(self.main, 1000) if not display else p.run(self.show_main, 1000)
+        winner = p.run(self.main, None)
 
-        if False:
+        
+
+        @socket.on('quit')
+        def quit_train(msg):
+            print("QUITTING TRIANINGS")
+            quit()
+        if False and not self.kill:
             with open("winner.pkl", "wb") as f:
                 pickle.dump(winner, f)
                 f.close()
 
+        self.kill = False
 
-    # def draw_window(self, win, testBox = None, sp = False):
-    #     self.game_bg_image.draw(win)
-
-    #     for ball in self.balls:
-    #         ball.draw(win)
-
-    #     if testBox != None: testBox.draw(win)    
-    #     pygame.display.update()
 
     def emit_data(self,name, socket):
-
         balls_data = []
         for ball in self.balls:
             balls_data.append(ball.get_data())
 
-        
         socket.emit(name,json.dumps(balls_data))
 
-    def play_solo(self, socket):
-        time = pygame.time.Clock()
-        
-        ball = Ball(self)
-
-        run = len(self.balls)
-        while run:
-            global bboxes
-
-
-            time.tick(300)
-            if len(self.balls) == 0:
-                continue
-            
-            @socket.on('input')
-            def make_move(input):
-                print("GOT KEYPRESS");
-                if input == "right" and len(self.balls) > 0:
-                    ball.jump(True)
-                elif input == "left" and len(self.balls) > 0:
-                    ball.jump(False)
-                elif input == "quit":
-                    print("RECIVED MESSAGE: " + input )
-                    self.balls = []
-
-
-                    
-
-            if not run or len(self.balls) == 0:
-                break
-
-            for ball in self.balls:
-                ball.move(None, None , -1, self)
-            self.emit_data("screen", socket)
-
-
-     
+    def play_solo(self, socketio):
+        global socket
+        print("PLAYING SOLO")
+        Ball(self)
+        socket = socketio
+        self.main([],None,250)
 
 
 
-    def main(self, genomes, config, ticks = 250, display = False, quit = False):
+    def main(self, genomes, config, ticks = 250, display = False):
         nets = []
         ge = []
+
 
         for genome_id , g in genomes:
             net = neat.nn.FeedForwardNetwork.create(g, config)
@@ -140,25 +116,43 @@ class Game:
             g.fitness = 0
             ge.append(g)
 
-        if display:
-            win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-            time = pygame.time.Clock()
+
+        print(len(nets))
+
+        time = pygame.time.Clock()
             
-        run = True
+        run = len(self.balls)
         while run:
             global bboxes
-            if display: 
-                time.tick(ticks)
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        run = False
-                        pygame.quit()
-                        quit()
+            time.tick(ticks)
+            
+            if len(nets) == 0 and len(ge) == 0:
+                @socket.on('input')
+                def make_move(input):
+                    if input == "right" and len(self.balls) > 0:
+                        ball.jump(True)
+                    elif input == "left" and len(self.balls) > 0:
+                        ball.jump(False)
+                    # elif input == "quit":
+                    #     self.balls = []
 
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_r and display:
-                            print("restarting")
-                            self.__init__()
+            @socket.on('quit')
+            def quit_game(msg):
+                print("QUITTING, " , genomes)
+                if genomes:
+                    self.kill = True
+                self.balls = []
+                # raise Exception()
+                # self.balls = []
+                # self.ge = []
+                # self.nets = []
+                # self.quit = True
+
+            if self.kill:
+                print("attempting to extincit these")
+                if ge:
+                    ge[0].fitness = sys.maxsize
+                return
 
             i = len(self.balls) - 1
             while i >= 0:
@@ -169,12 +163,13 @@ class Game:
 
                 i -= 1
 
-            if display: self.draw_window(win)#,  testBox)
-            
+            # if display: self.draw_window(win)#,  testBox)
+            self.emit_data("screen", socket)
+
 
             if len(self.balls) == 0:
-                if quit:self.__init__()
-                else:
-                    return
+                self.__init__()
+
+                return
 
         #self.menu(win)

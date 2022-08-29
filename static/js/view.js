@@ -22,8 +22,8 @@ $(document).ready(function(){
     var gameHeight = null;
 
 
-    //to quit any previous games
-    socket.emit("input", "quit");
+    //to quit any previous sessions
+    socket.emit("quit", "quit");
 
     mode = window.location.href.split('#')[-1]
 
@@ -95,6 +95,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
     
         ctx.fillRect(rect.x,rect.y, rect.width,rect.height);
         ctx.fillStyle = 'white';
+        ctx.font = "20px Verdana";
         ctx.fillText("(M) Menu", rect.x, rect.y + 30, rect.width)
     }
     
@@ -102,8 +103,6 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
         messagesRecieved += 1
         let secondsElapsed = (new Date() - start)/1000;
-
-
 
 
 
@@ -179,7 +178,6 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
             
             ctx.font = "30px Bold Arial";
             ctx.fillStyle = "white";
-            ctx.fillText("Average messages recieveed per sec:" + (messagesRecieved/secondsElapsed).toString() , canvas.width*.6, canvas.height*.1)
 
 
 
@@ -224,7 +222,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
     function returnToMenu(){
         console.log("returning to menu")
 
-        socket.emit('input', "quit")
+        socket.emit('quit', "quit")
 
 
         

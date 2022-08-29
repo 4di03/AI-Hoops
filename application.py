@@ -36,7 +36,7 @@ app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = False
 
 
-game_mode= "solo"
+game_mode= ""
 
 #turn the flask app into a socketio app
 socketio = SocketIO(app, async_mode=None, logger=False, engineio_logger=False)
@@ -61,6 +61,9 @@ def randomNumberGenerator():
 
 @app.route('/')
 def index():
+    global game_mode
+ 
+    game_mode = ""
     #only by sending this page first will the client be connected to the socketio instance
     return render_template('index.html')
 
@@ -96,7 +99,7 @@ def test_connect():
 def recieve_mode(mode):
     global game_mode 
 
-
+    print("GOT MODE: " + mode)
     game_mode = mode
 
 @socketio.on('start')
@@ -106,7 +109,6 @@ def prompt_mode(waste):
 
     game = Game()
 
-    print("GAME STARTED")
 
     if game_mode == "solo":
         game.play_solo(socketio)

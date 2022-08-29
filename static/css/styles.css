@@ -14,3 +14,8 @@ canvas{
   -o-background-size: cover;
   background-size: cover; 
 }
+
+.fadeOut{
+  animation: fadeOut;
+  animation-duration: 0.5s;
+}

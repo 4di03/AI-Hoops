@@ -1,11 +1,27 @@
 // import {Solo, Train, Winner} from "./modes.js";
 
+function loadGame(){
+
+
+    document.getElementById("btns").innerHTML = "";
+
+    document.getElementById("content").innerHTML = "<img src='static/assets/ball_loader.gif'></img>";
+
+
+    
+
+}
+
 function openCanvas(mode, socket){
 
     // alert(mode.constructor.name)
     // sessionStorage.setItem('mode', JSON.stringify(mode));
     socket.emit("recieve_mode", mode)
-    window.location.replace('game');
+    loadGame()
+    setTimeout(
+        function(){     
+        window.location.replace('game')
+    }, 1000);
 
 }
 
