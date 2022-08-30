@@ -4,24 +4,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
 
-    <script src="static/js/train.js"></script>
-
-    <script type="text/javascript">
-
-		$(function(){
-
-		$('.range input').on('mousemove', function(){
-			var getValRange = $(this).val();
-			$('.range span').text(getValRange);
-		});
-
-
-		});
-
-
-	</script>
-
-
+    <script src="../static/js/train.js"></script>
 
     <link
     rel="stylesheet"
@@ -30,6 +13,9 @@
 
     <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="../static/css/train_style.css">
+
+    <script src="../static/components/config-input.js" type="text/javascript" defer></script>
+
 
 </head>
 <body>
@@ -46,32 +32,38 @@
 
         <ul>
             <li>
-                Max Generations
-                <div class = "range">
-                    <input type = "range" min = "1" max = "1000" step = "1" />
-                    <span> 500</span>
-                </div>
+                <config-input type="range", min = 1, max = 1000, step = 1, id = "max_gens"> Max Generations</config-input>
             </li>
             <li>
-                Population Size
-                <div class = "range">
-                    <input type = "range" min = "1" max = "1000" step = "1" />
-                    <span> 500</span>
-                </div>
+                <config-input type="range", min = 1, max = 100, step = 1, id = "pop_size"> Population Size</config-input>
+
             </li>
             <li>
-                Fitness Threshold
-                <div class = "range">
-                    <input type = "range" min = "1" max = "1000" step = "1" />
-                    <span> 500</span>
-                </div>
+                <config-input type="range", min = 100, max = 50000, step = 1, id = "fitness_threshold"> Fitness Threshold</config-input>
+
             </li>
             <li>
-                Survival Threshold
-                <div class = "range">
-                    <input type = "range" min = "1" max = "1000" step = "1" />
-                    <span> 500</span>
-                </div>
+                <config-input type="range", min = 0, max = 1, step = 0.05, id = "survival_threshold">Surival Threshold</config-input>
+
+            </li>
+            <li>
+                <config-input type="checkbox" id="reset_on_extinction">Reset On Extinction</config-input>
+            </li>
+
+            <li>
+                <config-input type="range",min = 1, max=1000, step =1 , id="max_stagnation">Max Allowed Species Stagnation</config-input>
+
+            </li>
+            <li>
+
+                <config-input type = "range",min = 0, max = 1, step = 0.01, id = "conn_add_prob"> Chance of Adding Connection </config-input>
+
+            </li>
+
+            <li>
+
+                <config-input type = "range",min = 0, max = 1, step = 0.01, id = "conn_delete_prob"> Chance of Deleting Connection </config-input>
+
             </li>
     
             <li>
@@ -80,6 +72,8 @@
     
             </li>
         </ul>
+
+
 
         <br>
         <span class = "readeMore"> read more about NEAT <a href = "https://neat-python.readthedocs.io/en/latest/">here</a></span>

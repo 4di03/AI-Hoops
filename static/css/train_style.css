@@ -100,3 +100,14 @@ main {
 .container{
     display: block;
 }
+
+/* li .checkbox{
+float:right;
+margin-right: 50%;
+
+} */
+
+li .checkbox input{
+  width: 30px;
+  height: 30px;
+}
