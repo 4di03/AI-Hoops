@@ -228,10 +228,22 @@ margin-top: 3%;
   box-shadow: #3c4fe0 0 3px 7px inset;
   transform: translateY(2px);
 }
+
+#menu-btn{
+  background-image: radial-gradient(100% 100% at 100% 0, #c9cc24 0, #e22c0b 100%);
+  margin-left: 20px;
+}
+
+#menu-button:active{
+  box-shadow: #c9781d 0 3px 7px inset;
+  transform: translateY(2px);
+}
+
 .readMore{
   margin-top:20px;
   float:right;
   font-family: '1982';
   color:black;
   font-weight: 1000;
+  vertical-align: middle;
 }

@@ -39,13 +39,13 @@ class ConfigInput extends HTMLElement{
         if (this.type == "range"){
 
         this.innerHTML = `${this.text}<div class = "${this.type}" id ="${this.id}">
-        <input type = "${this.type}" min = "${this.min}" max = "${this.max}" step = "${this.step}" />
+        <input  id = ${this.id} type = "${this.type}" min = "${this.min}" max = "${this.max}" step = "${this.step}" />
             <span> ${mid}</span>
         </div>`;
 
         } else if (this.type =="checkbox"){
             this.innerHTML = `${this.text} <div class = "${this.type}" id ="${this.id}">
-            <input type = "${this.type}"  checked/>
+            <input id = ${this.id} type = "${this.type}"  checked/>
             </div>`;
 
 
@@ -58,7 +58,12 @@ class ConfigInput extends HTMLElement{
             for(let i =0; i < options.length; i++){
                 let option = options[i];
                 
-                contents += `<input type ='radio' id ='${option}' value = '${option}' name='${title}'/><label for='${option}'>${option}</label><br>`
+                let checked= "";
+                if(i ==0){
+                    checked = "checked";
+                }
+
+                contents += `<input type ='radio' id ='${option}' value = '${option}' name='${title}' ${checked} /><label for='${option}'>${option}</label><br>`
                 
             }
 
@@ -68,10 +73,8 @@ class ConfigInput extends HTMLElement{
 
         } else if (this.type == "select-dropdown"){
             let split = this.text.split("*")
-            console.log(split)
             var title = split[0]
             var options = split[1].split(",")
-            console.log(title)
 
             let contents = ``;
             for(let i =0; i < options.length; i++){
@@ -81,11 +84,12 @@ class ConfigInput extends HTMLElement{
                 
             }
 
-            this.innerHTML =`${title}:<br><div class = '${this.type}' id = '${this.id}'><select>${contents}</select></div>`;
-
-            console.log(this.innerHTMLs)
+            this.innerHTML =`${title}:<br><div class = '${this.type}' id = '${this.id}'><select  id = ${this.id}>${contents}</select></div>`;
 
 
+
+        } else if (this.type == "file"){
+            this.innerHTML= `${this.text}<input type="file" id ="${this.id} accept =".txt"></input>`
         }
 
     }

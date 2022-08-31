@@ -150,8 +150,8 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
                 pos = text[0]
                 word = text[1];
                 color = text[2];
-                font = (0.0125*canvas.height).toString() +"px Arial";
-                drawScaled(pos[0], pos[1], ctx, null, null, null, [word, font, color])
+                font = (0.0250*canvas.height).toString() +"px Arial";
+                drawScaled(pos[0], pos[1]+10, ctx, null, null, null, [word, font, color])
             }
 
 
