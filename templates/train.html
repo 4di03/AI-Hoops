@@ -31,6 +31,8 @@
 
 
         <ul>
+
+            <div class = "ranges">
             <li>
                 <config-input type="range", min = 1, max = 1000, step = 1, id = "max_gens"> Max Generations</config-input>
             </li>
@@ -46,10 +48,7 @@
                 <config-input type="range", min = 0, max = 1, step = 0.05, id = "survival_threshold">Surival Threshold</config-input>
 
             </li>
-            <li>
-                <config-input type="checkbox" id="reset_on_extinction">Reset On Extinction</config-input>
-            </li>
-
+    
             <li>
                 <config-input type="range",min = 1, max=1000, step =1 , id="max_stagnation">Max Allowed Species Stagnation</config-input>
 
@@ -65,18 +64,68 @@
                 <config-input type = "range",min = 0, max = 1, step = 0.01, id = "conn_delete_prob"> Chance of Deleting Connection </config-input>
 
             </li>
-    
+            </div>
+            
+
+            <div class="boxes">
+            
             <li>
+                <config-input type="checkbox" id="reset_on_extinction">Reset On Extinction</config-input>
+            </li>
+
+            <li>
+                <config-input type="checkbox" id="graphics_choice">Graphics On(slows down training)</config-input>
+            </li>
+
+            <li>
+                <config-input type="checkbox" id="winner_choice">Override Previous Winner</config-input>
+            </li>
+            </div>
+
+            <div class = "radios">
+
+                <li>
+
+                    <config-input type="radio" id="nn_type">Choose Neural Network:Feed-Forward NN, Recurrent NN</config-input>
+
+                </li>
+
+            </div>
+            <li>
+
+
+            <config-input type="select-dropdown" id="act_func">Select Default <a  target="_blank" rel="noopener noreferrer" href ="https://neat-python.readthedocs.io/en/latest/activation.html#activation-functions-label">Activation Function</a>
+                 *tanh,relu,sigmoid,softplus,square,clamped,cube,exp,gauss,hat,identity,inv,log,lelu,selu,square</config-input>
+            
+            <!-- Select Default Activation Function: <br>
+            <div class="select-dropdown">
+                <select>
+                  <option value="Option 1">First Option</option>
+                  <option value="Option 2">2nd Option</option>
+                  <option value="Option 3">Option Number 3</option>
+                </select>
+            </div> -->
+
+        </li>
+
+            <li class = "file">
     
-                or Submit your own config text file here : 
+                Or submit your own config text file here : 
+                <input type="file" id="config-file" accept=".txt"></input>
     
+            </li>
+
+
+            <li class = "submit">
+                <button class ="button-29" role="button">Begin Training</button>
+
+                <span class = "readMore"> read more about <a href = "https://neat-python.readthedocs.io/en/latest/">N.E.A.T.</a></span>
+
             </li>
         </ul>
 
 
 
-        <br>
-        <span class = "readeMore"> read more about NEAT <a href = "https://neat-python.readthedocs.io/en/latest/">here</a></span>
 
     
     </div>

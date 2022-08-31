@@ -19,6 +19,8 @@ import sys
 
 GEN = 0
 socket = None
+NET_TYPE = neat.nn.FeedForwardNetwork
+
 
 class Game:
     config_path = "./model/config-feedforward.txt"
@@ -110,7 +112,7 @@ class Game:
 
 
         for genome_id , g in genomes:
-            net = neat.nn.FeedForwardNetwork.create(g, config)
+            net = NET_TYPE.create(g, config)
             nets.append(net)
             Ball(self)
             g.fitness = 0

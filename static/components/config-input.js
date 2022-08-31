@@ -44,9 +44,48 @@ class ConfigInput extends HTMLElement{
         </div>`;
 
         } else if (this.type =="checkbox"){
-            this.innerHTML = `${this.text}<div class = "${this.type}" id ="${this.id}">
-            <input type = "${this.type}" />
+            this.innerHTML = `${this.text} <div class = "${this.type}" id ="${this.id}">
+            <input type = "${this.type}"  checked/>
             </div>`;
+
+
+        } else if (this.type == "radio"){
+            var title = this.text.split(":")[0]
+            var options = this.text.split(":")[1].split(",")
+            
+
+            let contents = ``;
+            for(let i =0; i < options.length; i++){
+                let option = options[i];
+                
+                contents += `<input type ='radio' id ='${option}' value = '${option}' name='${title}'/><label for='${option}'>${option}</label><br>`
+                
+            }
+
+            this.innerHTML =`${title}:<br><div class = '${this.type}' id = '${this.id}'>${contents}</div>`;
+
+
+
+        } else if (this.type == "select-dropdown"){
+            let split = this.text.split("*")
+            console.log(split)
+            var title = split[0]
+            var options = split[1].split(",")
+            console.log(title)
+
+            let contents = ``;
+            for(let i =0; i < options.length; i++){
+                let option = options[i];
+                
+                contents += `<option value = '${option}'/>${option}</option>`
+                
+            }
+
+            this.innerHTML =`${title}:<br><div class = '${this.type}' id = '${this.id}'><select>${contents}</select></div>`;
+
+            console.log(this.innerHTMLs)
+
+
         }
 
     }

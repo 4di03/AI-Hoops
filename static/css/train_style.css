@@ -70,8 +70,8 @@
 
 .form{
     text-align: left;
-    float:left;
-    width:50%;
+    width:60%;
+    margin:auto;
 } 
 
 li{
@@ -79,7 +79,8 @@ li{
     width:100%;
     font-family: Verdana;
     font-size: 20px;
-    color:  rgb(193, 193, 209)
+    color:  rgb(193, 193, 209);
+    margin-bottom: 20px;
 
 }
 
@@ -108,6 +109,129 @@ margin-right: 50%;
 } */
 
 li .checkbox input{
-  width: 30px;
+  width: 25px;
   height: 30px;
+}
+.boxes{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.boxes li{
+  width: auto;
+  margin-left:20px;
+  text-align: center;
+}
+
+.file{
+font-size: 30px;
+margin-top: 3%;  
+}
+.file input{
+  vertical-align: middle;
+}
+
+.radio {
+  width:100%;
+  text-align: left;;
+}
+
+.radio input{
+  margin-top: 20px;
+}
+
+.select-dropdown,
+.select-dropdown * {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  box-sizing: border-box;
+  width:20%;
+}
+.select-dropdown {
+  position: relative;
+  background-color: #E6E6E6;
+  border-radius: 4px;
+  margin-top: 10px;
+
+}
+.select-dropdown select {
+  font-size: 1rem;
+  font-weight: normal;
+  width:100%;
+  max-width: 100%;
+  padding: 8px 24px 8px 10px;
+  border: none;
+  background-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  appearance: none;
+}
+.select-dropdown select:active, .select-dropdown select:focus {
+  outline: none;
+  box-shadow: none;
+}
+.select-dropdown:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 0;
+  height: 0;
+  margin-top: -2px;
+  border-top: 5px solid #aaa;
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+}
+
+/* CSS */
+.button-29 {
+  align-items: center;
+  appearance: none;
+  background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);
+  border: 0;
+  border-radius: 6px;
+  box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: "JetBrains Mono",monospace;
+  height: 48px;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding-left: 16px;
+  padding-right: 16px;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow,transform;
+  font-size: 18px;
+}
+
+.button-29:focus {
+  box-shadow: #3c4fe0 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+}
+
+.button-29:hover {
+  box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+  transform: translateY(-2px);
+}
+
+.button-29:active {
+  box-shadow: #3c4fe0 0 3px 7px inset;
+  transform: translateY(2px);
+}
+.readMore{
+  margin-top:20px;
+  float:right;
+  font-family: '1982';
+  color:black;
+  font-weight: 1000;
 }
