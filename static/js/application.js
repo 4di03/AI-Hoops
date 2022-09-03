@@ -12,7 +12,7 @@ function loadGame(){
 
 }
 
-export function openCanvas(mode, socket){
+function openCanvas(mode, socket){
 
     // alert(mode.constructor.name)
     // sessionStorage.setItem('mode', JSON.stringify(mode));
@@ -101,8 +101,7 @@ $(document).ready(function(){
 
 /*
 Todo List:
-1. GET config from client, pack it into js
-2. READ config on server, send message to update config/start training
 3. Make text view mode for training
-4. Fix multiple client problem(events overriding eachother) namespaces?
+4. Add global and local winner
+5. Fix multiple client problem(events overriding eachother) namespaces?
 */

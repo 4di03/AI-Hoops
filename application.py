@@ -19,6 +19,7 @@ Updated 13th April 2018
 
 
 # Start with a basic flask app webpage.
+from distutils.command.config import config
 from flask_socketio import SocketIO, emit
 from flask import Flask, render_template, url_for, copy_current_request_context
 from random import random
@@ -29,6 +30,8 @@ from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
 import psutil
 import os
+import configparser
+
 __author__ = 'slynn'
 
 app = Flask(__name__)
@@ -38,12 +41,44 @@ app.config['DEBUG'] = False
 
 game_mode= ""
 
+config_data = {}
+
+
+cfg_parser = configparser.ConfigParser()
+
+
+cfg_parser.read("model/default_config.txt")
+
+
 #turn the flask app into a socketio app
 socketio = SocketIO(app, async_mode=None, logger=False, engineio_logger=False)
 
 #random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
+
+
+
+#creates config.txt from config object
+def create_config_file(parser, config_data):
+    # print(parser.sections())
+    print(config_data)    
+    for section in config_data:
+        if section != "undefined":
+            for key in config_data[section]:
+                parser[section][key] = config_data[section][key]
+
+        
+    with open("model/config.txt", mode = "w") as cfg:
+
+        #rewrite config into local file
+        if config_data["undefined"]["config-file"] != "":
+            parser = configparser.ConfigParser()
+            parser.read(config_data["undefined"]["config-file"])
+
+        parser.write(cfg)
+
+        cfg.close()
 
 def randomNumberGenerator():
     """
@@ -84,7 +119,16 @@ def handle_message(data):
     print('received message: ' + data)
 
 
+@socketio.on("train_config")
+def send_config(msg):
+    global config_data
 
+    config_data = json.loads(msg)
+
+    create_config_file(cfg_parser, config_data)
+
+
+    socketio.emit("confirm_config", "")
 
 
 @socketio.on('connect')
@@ -113,7 +157,7 @@ def prompt_mode(waste):
     #choose the gamemode for the game
     socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]))
 
-    game = Game()
+    game = Game(config_data["undefined"])
 
 
     if game_mode == "solo":

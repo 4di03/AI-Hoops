@@ -8,7 +8,7 @@ reset_on_extinction   = True
 # node activation options
 activation_default      = relu
 activation_mutate_rate  = 0.2
-activation_options      = tanh relu sigmoid softplus square clamped cube exp gauss hat identity inv log lelu selu square
+activation_options      = tanh relu sigmoid softplus square clamped cube exp gauss hat identity inv log square
 
 # node aggregation options
 aggregation_default     = sum

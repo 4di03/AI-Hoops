@@ -31,37 +31,37 @@
 
 
         <ul>
-
             <div class = "ranges">
+
             <li>
-                <config-input type="range", min = 1, max = 1000, step = 1, id = "max_gens"> Max Generations</config-input>
+                <config-input type="range" min = 1 max = 1000 step = 1 id = "max_gens" > Max Generations</config-input>
             </li>
             <li>
-                <config-input type="range", min = 1, max = 100, step = 1, id = "pop_size"> Population Size</config-input>
+                <config-input type="range" min = 2 max = 100 step = 1 id = "pop_size" section = "NEAT"> Population Size</config-input>
 
             </li>
             <li>
-                <config-input type="range", min = 100, max = 50000, step = 1, id = "fitness_threshold"> Fitness Threshold</config-input>
+                <config-input type="range" min = 100 max = 50000 step = 1 id = "fitness_threshold" section = "NEAT"> Fitness Threshold</config-input>
 
             </li>
             <li>
-                <config-input type="range", min = 0, max = 1, step = 0.05, id = "survival_threshold">Surival Threshold</config-input>
+                <config-input type="range" min = 0.1 max = 1 step = 0.05 id = "survival_threshold" section = "DefaultReproduction">Surival Threshold</config-input>
 
             </li>
     
             <li>
-                <config-input type="range",min = 1, max=1000, step =1 , id="max_stagnation">Max Allowed Species Stagnation</config-input>
+                <config-input type="range" min = 1 max=1000 step =1  id="max_stagnation" section = "DefaultStagnation">Max Allowed Species Stagnation</config-input>
 
             </li>
             <li>
 
-                <config-input type = "range",min = 0, max = 1, step = 0.01, id = "conn_add_prob"> Chance of Adding Connection </config-input>
+                <config-input type = "range" min = 0 max = 1 step = 0.01 id = "conn_add_prob" section = "DefaultGenome"> Chance of Adding Connection </config-input>
 
             </li>
 
             <li>
 
-                <config-input type = "range",min = 0, max = 1, step = 0.01, id = "conn_delete_prob"> Chance of Deleting Connection </config-input>
+                <config-input type = "range" min = 0  max = 1  step = 0.01  id = "conn_delete_prob" section = "DefaultGenome"> Chance of Deleting Connection </config-input>
 
             </li>
             </div>
@@ -70,7 +70,7 @@
             <div class="boxes">
             
             <li>
-                <config-input type="checkbox" id="reset_on_extinction">Reset On Extinction</config-input>
+                <config-input type="checkbox" id="reset_on_extinction" section = "NEAT">Reset On Extinction</config-input>
             </li>
 
             <li>
@@ -86,7 +86,7 @@
 
                 <li>
 
-                    <config-input type="radio" id="nn_type">Choose Neural Network:Feed-Forward NN, Recurrent NN</config-input>
+                    <config-input type="radio" id="nn_type">Choose Neural Network:Feed-Forward NN,Recurrent NN</config-input>
 
                 </li>
 
@@ -94,8 +94,8 @@
             <li>
 
 
-            <config-input type="select-dropdown" id="act_func">Select Default <a  target="_blank" rel="noopener noreferrer" href ="https://neat-python.readthedocs.io/en/latest/activation.html#activation-functions-label">Activation Function</a>
-                 *tanh,relu,sigmoid,softplus,square,clamped,cube,exp,gauss,hat,identity,inv,log,lelu,selu,square</config-input>
+            <config-input type="select-dropdown" id="activation_default" section = "DefaultGenome">Select Default <a  target="_blank" rel="noopener noreferrer" href ="https://neat-python.readthedocs.io/en/latest/activation.html#activation-functions-label">Activation Function</a>
+                 *relu,tanh,sigmoid,softplus,square,clamped,cube,exp,gauss,hat,identity,inv,log,square</config-input>
             
             <!-- Select Default Activation Function: <br>
             <div class="select-dropdown">
@@ -122,7 +122,7 @@
                 <button class ="button-29" id ="menu-btn" role="button" type ="button">Menu</button>
 
 
-                <span class = "readMore"> read more about <a href = "https://neat-python.readthedocs.io/en/latest/">N.E.A.T.</a></span>
+                <span class = "readMore"> read more about <a  target ="_blank" href= "https://neat-python.readthedocs.io/en/latest/">N.E.A.T.</a></span>
 
             </li>
         </ul>

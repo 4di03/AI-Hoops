@@ -9,13 +9,14 @@ class ConfigInput extends HTMLElement{
         this.step = 1;
         this.text = this.innerHTML;
         this.id = "";
-        this.round = "true";        
+        this.round = "true";   
+        this.section = null;     
     }
 
       
     // component attributes
     static get observedAttributes() {
-        return ['type','min','max', 'step', 'id', 'round'];
+        return ['type','min','max', 'step', 'id', 'round', 'section'];
     }
 
      
@@ -39,13 +40,13 @@ class ConfigInput extends HTMLElement{
         if (this.type == "range"){
 
         this.innerHTML = `${this.text}<div class = "${this.type}" id ="${this.id}">
-        <input  id = ${this.id} type = "${this.type}" min = "${this.min}" max = "${this.max}" step = "${this.step}" />
+        <input   id = ${this.id} type = "${this.type}" min = "${this.min}" max = "${this.max}" step = "${this.step}" />
             <span> ${mid}</span>
         </div>`;
 
         } else if (this.type =="checkbox"){
             this.innerHTML = `${this.text} <div class = "${this.type}" id ="${this.id}">
-            <input id = ${this.id} type = "${this.type}"  checked/>
+            <input  id = ${this.id} type = "${this.type}"  checked/>
             </div>`;
 
 
@@ -63,7 +64,7 @@ class ConfigInput extends HTMLElement{
                     checked = "checked";
                 }
 
-                contents += `<input type ='radio' id ='${option}' value = '${option}' name='${title}' ${checked} /><label for='${option}'>${option}</label><br>`
+                contents += `<input type ='radio'  id ='${option}' value = '${option}' name='${title}' ${checked} /><label for='${option}'>${option}</label><br>`
                 
             }
 
@@ -89,7 +90,7 @@ class ConfigInput extends HTMLElement{
 
 
         } else if (this.type == "file"){
-            this.innerHTML= `${this.text}<input type="file" id ="${this.id} accept =".txt"></input>`
+            this.innerHTML= `${this.text}<input type="file" id ="${this.id}" accept =".txt"></input>`
         }
 
     }
@@ -105,13 +106,13 @@ $(function(){
     $('.range input').on('mousemove', function(){
         var getValRange = $(this).val();
         var id = $(this).parent().attr('id');
-        var val = ((getValRange/100) * (parseInt(this.max) - parseInt(this.min))) + parseInt(this.min);
-        if (Number.isInteger(parseFloat(this.step))){
-        var val = Math.round(((getValRange/100) * (parseInt(this.max) - parseInt(this.min))) + parseInt(this.min));
-        } 
+        // var val = ((getValRange/100) * (parseInt(this.max) - parseInt(this.min))) + parseInt(this.min);
+        // if (Number.isInteger(parseFloat(this.step))){
+        // var val = Math.round(((getValRange/100) * (parseInt(this.max) - parseInt(this.min))) + parseInt(this.min));
+        // } 
 
 
-        $(`#${id} span`).text(val);
+        $(`#${id} span`).text(getValRange);
     });
 
 
