@@ -31,18 +31,20 @@ class Game:
         self.show_display_options = False
         os.environ["SDL_VIDEODRIVER"] = "dummy"
         self.kill = False
-        self.custom_config = custom_config
-        self.max_gens = int(custom_config["max_gens"])
-        if "Feed-Forward NN" in custom_config:
-            self.net_type = neat.nn.FeedForwardNetwork
-        else: 
-            self.net_type = neat.nn.RecurrentNetwork
+        self.custom_config = None
+        if custom_config:
+            self.max_gens = int(custom_config["max_gens"])
+            if "Feed-Forward NN" in custom_config:
+                self.net_type = neat.nn.FeedForwardNetwork
+            else: 
+                self.net_type = neat.nn.RecurrentNetwork
 
-        self.graphics = custom_config["graphics_choice"] == "on"
-        self.override_winner = custom_config["winner_choice"] == "on"
+            self.graphics = custom_config["graphics_choice"] == "on"
+            self.override_winner = custom_config["winner_choice"] == "on"
+            self.custom_config = custom_config
+
         self.gen = 0
-        self.custom_config = custom_config
-        print(self.net_type)
+
  
         
     

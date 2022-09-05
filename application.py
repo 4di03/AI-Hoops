@@ -157,7 +157,7 @@ def prompt_mode(waste):
     #choose the gamemode for the game
     socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]))
 
-    game = Game(config_data["undefined"])
+    game = Game(config_data["undefined"] if "undefined" in config_data else None)
 
 
     if game_mode == "solo":
