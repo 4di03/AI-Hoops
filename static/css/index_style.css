@@ -1,4 +1,4 @@
-/* credit to https://freefrontend.com/css-buttons/ for animations*/
+/* credit to https://freefrontend.com/css-.buttons/ for animations*/
 
 /* import 'animate.css'; */
 @font-face {
@@ -37,7 +37,7 @@ main {
           animation: rotateAngle 6s linear infinite;
 }
 
-button {
+.button {
   display: block;
   position: relative;
   margin: 0.5em 0;
@@ -55,7 +55,7 @@ button {
   perspective: 500px;
   transform-style: preserve-3d;
 }
-button:before, button:after {
+.button:before, .button:after {
   --z: 0px;
   position: absolute;
   top: 0;
@@ -70,26 +70,26 @@ button:before, button:after {
   transform-style: preserve-3d;
   transform: translate3d(calc(var(--z) * 0px), calc(var(--z) * 0px), calc(var(--z) * 0px));
 }
-button span {
+.button span {
   mix-blend-mode: none;
   display: block;
 }
-button:after {
+.button:after {
   background-color: #5D00FF;
 }
-button:before {
+.button:before {
   background-color: #FF1731;
 }
-button:hover {
+.button:hover {
   background-color: #FFF65B;
   transition: background 0.3s 0.1s;
 }
-button:hover:before {
+.button:hover:before {
   --z: 0.04;
   -webkit-animation: translateWobble 2.2s ease forwards;
           animation: translateWobble 2.2s ease forwards;
 }
-button:hover:after {
+.button:hover:after {
   --z: -0.06;
   -webkit-animation: translateWobble 2.2s ease forwards;
           animation: translateWobble 2.2s ease forwards;

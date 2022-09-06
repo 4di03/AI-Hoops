@@ -89,12 +89,48 @@ $(document).ready(function(){
         openTrainSettings('train', socket);
     });
 
+    let model_type = "record";
+    $("#dialog").dialog({
+        autoOpen: false,
+        modal: true,
+        show: {
+            effect: "fade",
+            duration: 1000
+        },
+        hide: {
+
+            effect: "blind",
+            duration: 500
+        }, 
+        buttons: [{
+            text:"Use Record Model",
+            click: function(){
+                model_type = "record";
+                openCanvas('winner/'+model_type, socket);
+
+            }
+        },
+        {
+            text: "Use Local Best Model",
+            click : function(){
+                model_type = "local"
+                openCanvas('winner/'+model_type, socket);
+
+            }
+        }
+        ],
+        innerWidth: .4*window.innerWidth
+    });
 
     winner_btn.addEventListener('click', event =>{
 
+        $('#dialog').dialog("open");
 
-        openCanvas('winner', socket);
+        
     });
+
+
+  
 
 
 });

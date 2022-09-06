@@ -17,7 +17,6 @@ import sys
 # from application import config_data, create_config_file
 
 
-
 socket = None
 
 
@@ -25,13 +24,15 @@ class Game:
     config_path = "./model/config.txt"
 
 
-    def __init__(self, custom_config):
+    def __init__(self, custom_config, socketio):
+        global socket
         self.balls = []
         self.images = []
         self.show_display_options = False
         os.environ["SDL_VIDEODRIVER"] = "dummy"
         self.kill = False
-        self.custom_config = None
+        self.net_type = neat.nn.FeedForwardNetwork
+        socket = socketio
         if custom_config:
             self.max_gens = int(custom_config["max_gens"])
             if "Feed-Forward NN" in custom_config:
@@ -42,13 +43,17 @@ class Game:
             self.graphics = custom_config["graphics_choice"] == "on"
             self.override_winner = custom_config["winner_choice"] == "on"
             self.custom_config = custom_config
+        else:
+            self.custom_config = None
+
+
 
         self.gen = 0
 
  
         
     
-    def replay_genome(self,  socket, ticks = 250, genome_path="model/best_winner.pkl"):
+    def replay_genome(self, ticks = 250, genome_path="model/best_winner.pkl"):
         # Load requried NEAT config
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
 
@@ -72,10 +77,7 @@ class Game:
         self.main(genomes,config,display= True)
 
 
-    def train_AI(self, socketio, display = False):
-        global socket
-
-        socket= socketio
+    def train_AI(self, display = False):
 
         self.config_path = "./model/config.txt"
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
@@ -98,7 +100,7 @@ class Game:
             print("QUITTING TRIANINGS")
             quit()
         if self.override_winner and not self.kill:
-            with open("local_winner.pkl", "wb") as f:
+            with open("model/local_winner.pkl", "wb") as f:
                 pickle.dump(winner, f)
                 f.close()
 
@@ -106,17 +108,17 @@ class Game:
 
 
     def emit_data(self,name, socket):
+
         balls_data = []
         for ball in self.balls:
             balls_data.append(ball.get_data())
 
         socket.emit(name,json.dumps(balls_data))
 
-    def play_solo(self, socketio):
-        global socket
+
+    def play_solo(self):
         print("PLAYING SOLO")
         Ball(self)
-        socket = socketio
         self.main([],None,250)
 
 
@@ -185,7 +187,7 @@ class Game:
 
 
             if len(self.balls) == 0:
-                self.__init__(self.custom_config)
+                self.__init__(self.custom_config, socket)
 
                 return
 

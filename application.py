@@ -23,7 +23,6 @@ from distutils.command.config import config
 from flask_socketio import SocketIO, emit
 from flask import Flask, render_template, url_for, copy_current_request_context
 from random import random
-from time import sleep
 from threading import Thread, Event
 from model.Game import Game
 from model.objects import WIN_HEIGHT, WIN_WIDTH
@@ -51,7 +50,7 @@ cfg_parser.read("model/default_config.txt")
 
 
 #turn the flask app into a socketio app
-socketio = SocketIO(app, async_mode=None, logger=False, engineio_logger=False)
+socketio = SocketIO(app, async_mode=None, logger=False, engineio_logger=False,cors_allowed_origins="*")
 
 #random number Generator Thread
 thread = Thread()
@@ -157,15 +156,19 @@ def prompt_mode(waste):
     #choose the gamemode for the game
     socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]))
 
-    game = Game(config_data["undefined"] if "undefined" in config_data else None)
+    game = Game(config_data["undefined"] if "undefined" in config_data else None, socketio)
 
 
     if game_mode == "solo":
-        game.play_solo(socketio)
+        game.play_solo()
     elif game_mode == "train":
-        game.train_AI(socketio)
-    elif game_mode == "winner":
-        game.replay_genome(socketio)
+        game.train_AI()
+    elif game_mode.split("/")[0] == "winner":
+
+        if game_mode.split("/")[1] == "record":
+            game.replay_genome()
+        else:
+            game.replay_genome(genome_path="model/local_winner.pkl")
 
 
 @socketio.on('disconnect')
