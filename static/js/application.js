@@ -105,17 +105,18 @@ $(document).ready(function(){
         buttons: [{
             text:"Use Record Model",
             click: function(){
+                $("#dialog").dialog("close");
                 model_type = "record";
                 openCanvas('winner/'+model_type, socket);
-
             }
         },
         {
             text: "Use Local Best Model",
             click : function(){
+                $("#dialog").dialog("close");
+
                 model_type = "local"
                 openCanvas('winner/'+model_type, socket);
-
             }
         }
         ],

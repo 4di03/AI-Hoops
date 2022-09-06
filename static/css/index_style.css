@@ -207,7 +207,7 @@ main {
   height: 100%;
 }
 .ui-front {
-  z-index: 100;
+  z-index: 1000;
 }
 
 .ui-dialog{position:fixed;}
