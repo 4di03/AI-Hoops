@@ -119,12 +119,12 @@ $(document).ready(function(){
             }
         }
         ],
-        innerWidth: .4*window.innerWidth
-    });
+        minWidth: 600
+        });
 
     winner_btn.addEventListener('click', event =>{
 
-        $('#dialog').dialog("open");
+        $('#dialog').dialog("open",{modal:true});
 
         
     });
