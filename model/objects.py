@@ -3,14 +3,11 @@
 # from ipaddress import _IPAddressBase
 from operator import truediv
 import pygame
-import time
-import os
+
 import random
 pygame.font.init()
-import neat
-import pickle
+
 from model.Image import Image, Button
-import json
 
 
 WIN_WIDTH = 800

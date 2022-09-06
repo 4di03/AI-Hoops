@@ -1,10 +1,7 @@
 from lib2to3.pytree import generate_matches
 from socket import socketpair
-from tkinter.messagebox import YES
 import pygame
-import time
 import os
-import random
 pygame.font.init()
 import neat
 import pickle
@@ -12,7 +9,6 @@ from model.objects import Ball
 from model.Image import Image, Button
 from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG
 import json 
-import socketio
 import sys
 # from application import config_data, create_config_file
 
