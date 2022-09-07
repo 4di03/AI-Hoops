@@ -4,7 +4,8 @@ var imageMap = new Map();
 
 
 $(document).ready(function(){
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var protocol = window.location.protocol;
+    var socket = io.connect(protocol+ '//' + document.domain + ':' + location.port);
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext('2d');
 
