@@ -44,7 +44,7 @@ function openTrainSettings(mode, socket){
 
 $(document).ready(function(){
     //connect to the socket server.
-    var socket = io.connect('https://' + document.domain + ':' + location.port);
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
     var numbers_received = [];
 
     //receive details from server
