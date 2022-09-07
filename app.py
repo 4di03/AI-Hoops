@@ -12,7 +12,7 @@ import configparser
 from flask_cors import CORS
 app = Flask(__name__)
 
-CORS(app)
+#CORS(app)
 
 app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = False
