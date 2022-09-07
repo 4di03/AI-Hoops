@@ -9,8 +9,11 @@ from model.Game import Game
 from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
 import configparser
-
+from flask_cors import CORS
 app = Flask(__name__)
+
+CORS(app)
+
 app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = False
 
