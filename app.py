@@ -10,6 +10,9 @@ from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
 import configparser
 from flask_cors import CORS
+import eventlet
+
+eventlet.monkey_patch()
 app = Flask(__name__)
 
 #CORS(app)
@@ -32,9 +35,9 @@ cfg_parser.read("model/default_config.txt")
 #turn the flask app into a socketio app
 socketio = SocketIO(app, async_mode=None, logger=False, engineio_logger=False,cors_allowed_origins="*")
 
-#random number Generator Thread
-thread = Thread()
-thread_stop_event = Event()
+# #random number Generator Thread
+# thread = Thread()
+# thread_stop_event = Event()
 
 
 
@@ -59,18 +62,18 @@ def create_config_file(parser, config_data):
 
         cfg.close()
 
-def randomNumberGenerator():
-    """
-    Generate a random number every 2 seconds and emit to a socketio instance (broadcast)
-    Ideally to be run in a separate thread?
-    """
-    #infinite loop of magical random numbers
-    print("Making random numbers")
-    while not thread_stop_event.isSet():
-        number = round(random()*10, 3)
-        print("number:" + str(number))
-        socketio.emit('newnumber', {'number': number})
-        socketio.sleep(2)
+# def randomNumberGenerator():
+#     """
+#     Generate a random number every 2 seconds and emit to a socketio instance (broadcast)
+#     Ideally to be run in a separate thread?
+#     """
+#     #infinite loop of magical random numbers
+#     print("Making random numbers")
+#     while not thread_stop_event.isSet():
+#         number = round(random()*10, 3)
+#         print("number:" + str(number))
+#         socketio.emit('newnumber', {'number': number})
+#         socketio.sleep(2)
 
 
 @app.route('/')
@@ -117,8 +120,8 @@ def test_connect():
     print('Client connected')
 
     #Start the random number generator thread only if the thread has not been started before.
-    if not thread.is_alive():
-        print("Not Starting Thread")
+    # if not thread.is_alive():
+    #     print("Not Starting Thread")
         #thread = socketio.start_background_task(randomNumberGenerator)
 
 
