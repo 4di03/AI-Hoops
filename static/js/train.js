@@ -34,7 +34,7 @@ function openCanvas(mode, socket){
 
 
 $(document).ready(function(){
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('https://' + document.domain + ':' + location.port);
 
     let menu_btn = document.getElementById("menu-btn");
     let submit_btn = document.getElementById("submit-btn");
