@@ -100,7 +100,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
         ctx.canvas.width  = window.innerWidth;
         ctx.canvas.height = window.innerHeight;
-        // console.log(objects)
+        console.log(objects)
 
         objects = JSON.parse(objects);
         for (i = 0; i < objects.length ; i += 1){
