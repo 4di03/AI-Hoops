@@ -1,5 +1,7 @@
 
+import eventlet
 
+eventlet.monkey_patch()
 # Start with a basic flask app webpage.
 from flask_socketio import SocketIO, emit
 from flask import Flask, render_template, url_for, copy_current_request_context
@@ -10,9 +12,7 @@ from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
 import configparser
 from flask_cors import CORS
-# import eventlet
 
-# eventlet.monkey_patch()
 app = Flask(__name__)
 
 #CORS(app)
