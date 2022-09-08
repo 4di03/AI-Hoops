@@ -10,9 +10,9 @@ from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
 import configparser
 from flask_cors import CORS
-import eventlet
+# import eventlet
 
-eventlet.monkey_patch()
+# eventlet.monkey_patch()
 app = Flask(__name__)
 
 #CORS(app)
