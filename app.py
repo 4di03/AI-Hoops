@@ -33,7 +33,7 @@ cfg_parser.read("model/default_config.txt")
 
 
 #turn the flask app into a socketio app
-socketio = SocketIO(app, async_mode=None, logger=False, engineio_logger=False,cors_allowed_origins="*")
+socketio = SocketIO(app, async_mode="eventlet", logger=False, engineio_logger=False,cors_allowed_origins="*")
 
 # #random number Generator Thread
 # thread = Thread()

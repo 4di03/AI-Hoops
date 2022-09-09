@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 from lib2to3.pytree import generate_matches
 from socket import socketpair
 import pygame
@@ -110,6 +112,7 @@ class Game:
             balls_data.append(ball.get_data())
 
         socket.emit(name,json.dumps(balls_data))
+        socket.sleep(0)
 
 
     def play_solo(self):
@@ -180,6 +183,7 @@ class Game:
 
             # if display: self.draw_window(win)#,  testBox)
             self.emit_data("screen", socket)
+
 
 
             if len(self.balls) == 0:
