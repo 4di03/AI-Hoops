@@ -14,7 +14,7 @@ import json
 import sys
 # from application import config_data, create_config_file
 
-
+kill = False
 socket = None
 
 
@@ -76,7 +76,7 @@ class Game:
 
 
     def train_AI(self, display = False):
-
+        global kill
         self.config_path = "./model/config.txt"
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
@@ -91,18 +91,14 @@ class Game:
 
         winner = p.run(self.main, self.max_gens)
 
-        
 
-        @socket.on('quit')
-        def quit_train(msg):
-            print("QUITTING TRIANINGS")
-            quit()
-        if self.override_winner and not self.kill:
+        if self.override_winner and not kill:
+            print("overriding local winner")
             with open("model/local_winner.pkl", "wb") as f:
                 pickle.dump(winner, f)
                 f.close()
 
-        self.kill = False
+        kill = False
 
 
     def emit_data(self,name, socket):
@@ -156,21 +152,14 @@ class Game:
 
             @socket.on('quit')
             def quit_game(msg):
-                print("QUITTING")
-                if genomes:
-                    self.kill = True
-                self.balls = []
-                # raise Exception()
-                # self.balls = []
-                # self.ge = []
-                # self.nets = []
-                # self.quit = True
-
-            if self.kill:
-                print("attempting to extincit these")
+                global kill
+                print("QUITTING", genomes)
                 if ge:
+                    print("killing mode")
                     ge[0].fitness = sys.maxsize
-                return
+                    kill = True
+                self.balls = []
+
 
             i = len(self.balls) - 1
             while i >= 0:
