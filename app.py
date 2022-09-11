@@ -4,7 +4,7 @@ import eventlet
 eventlet.monkey_patch()
 # Start with a basic flask app webpage.
 from flask_socketio import SocketIO, emit
-from flask import Flask, render_template, url_for, copy_current_request_context
+from flask import Flask, render_template, url_for, copy_current_request_context, request
 from random import random
 from threading import Thread, Event
 from model.Game import Game
@@ -110,14 +110,13 @@ def send_config(msg):
     create_config_file(cfg_parser, config_data)
 
 
-    socketio.emit("confirm_config", "")
+    socketio.emit("confirm_config", "", to = request.sid)
 
 
 @socketio.on('connect')
 def test_connect():
     # need visibility of the global thread object
-    global thread
-    print('Client connected')
+    print(f'Client {request.sid} connected')
 
     #Start the random number generator thread only if the thread has not been started before.
     # if not thread.is_alive():
@@ -137,26 +136,30 @@ def recieve_mode(mode):
 @socketio.on('start')
 def prompt_mode(waste):
     #choose the gamemode for the game
-    socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]))
+    socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]), to= request.sid)
 
-    game = Game(config_data["undefined"] if "undefined" in config_data else None, socketio)
+    game = Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid)
 
-
+    print("STARTING GAME FOR " + str(request.sid))
+    mode = None
     if game_mode == "solo":
-        game.play_solo()
+        mode = game.play_solo
     elif game_mode == "train":
-        game.train_AI()
+        mode = game.train_AI
     elif game_mode.split("/")[0] == "winner":
 
         if game_mode.split("/")[1] == "record":
-            game.replay_genome()
+            mode = game.replay_genome
         else:
-            game.replay_genome(genome_path="model/local_winner.pkl")
+            mode = game.replay_local_genome
+
+    mode()
+
 
 
 @socketio.on('disconnect')
 def test_disconnect():
-    print('Client disconnected')
+    print(f'Client {request.sid} disconnected')
 
 
 if __name__ == '__main__':

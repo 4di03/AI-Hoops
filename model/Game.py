@@ -11,7 +11,8 @@ from model.objects import Ball
 from model.Image import Image, Button
 from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG
 import json 
-import sys
+import sys 
+from flask import request, copy_current_request_context
 # from application import config_data, create_config_file
 
 kill = False
@@ -22,8 +23,9 @@ class Game:
     config_path = "./model/config.txt"
 
 
-    def __init__(self, custom_config, socketio):
+    def __init__(self, custom_config, socketio, name = "no name"):
         global socket
+        self.name = name
         self.balls = []
         self.images = []
         self.show_display_options = False
@@ -49,7 +51,9 @@ class Game:
         self.gen = 0
 
  
-        
+    
+    def replay_local_genome(self):
+        self.replay_genome(genome_path='model/local_winner.pkl')
     
     def replay_genome(self, ticks = 250, genome_path="model/best_winner.pkl"):
         # Load requried NEAT config
@@ -100,14 +104,13 @@ class Game:
 
         kill = False
 
-
     def emit_data(self,name, socket):
 
         balls_data = []
         for ball in self.balls:
             balls_data.append(ball.get_data())
 
-        socket.emit(name,json.dumps(balls_data))
+        socket.emit(name,json.dumps(balls_data), to = request.sid)
         socket.sleep(0)
 
 
@@ -130,13 +133,12 @@ class Game:
             g.fitness = 0
             ge.append(g)
 
-
-        print(len(nets))
-
         time = pygame.time.Clock()
             
         run = len(self.balls)
         while run:
+            print(f"running game for {request.sid}")
+
             global bboxes
             time.tick(ticks)
             
@@ -147,18 +149,20 @@ class Game:
                         ball.jump(True)
                     elif input == "left" and len(self.balls) > 0:
                         ball.jump(False)
-                    # elif input == "quit":
-                    #     self.balls = []
+
 
             @socket.on('quit')
-            def quit_game(msg):
-                global kill
-                print("QUITTING", genomes)
-                if ge:
-                    print("killing mode")
-                    ge[0].fitness = sys.maxsize
-                    kill = True
-                self.balls = []
+            def quit_game(sid):
+
+                print("Quitting for " + sid)
+                if sid == request.sid:
+                    global kill
+                    print("QUITTING", genomes)
+                    if ge:
+                        print("killing mode")
+                        ge[0].fitness = sys.maxsize
+                        kill = True
+                    self.balls = []
 
 
             i = len(self.balls) - 1
@@ -170,7 +174,6 @@ class Game:
 
                 i -= 1
 
-            # if display: self.draw_window(win)#,  testBox)
             self.emit_data("screen", socket)
 
 
@@ -179,5 +182,3 @@ class Game:
                 self.__init__(self.custom_config, socket)
 
                 return
-
-        #self.menu(win)

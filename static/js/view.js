@@ -1,6 +1,7 @@
 
 var imageMap = new Map();
 
+// consider socket.on('connect', function(){});
 
 
 $(document).ready(function(){
@@ -13,9 +14,8 @@ $(document).ready(function(){
     var gameWidth = null;
     var gameHeight = null;
 
-
     //to quit any previous sessions
-    socket.emit("quit", "quit");
+    socket.emit("quit", socket.id);
 
     mode = window.location.href.split('#')[-1]
 
@@ -225,7 +225,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
     function returnToMenu(){
         console.log("returning to menu")
 
-        socket.emit('quit', "quit")
+        socket.emit('quit', socket.id)
 
 
         
@@ -253,4 +253,5 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
             returnToMenu()
         }
     }, false);
+
 });
