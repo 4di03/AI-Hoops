@@ -134,26 +134,28 @@ def recieve_mode(mode):
     socketio.emit("got game", "")
 
 @socketio.on('start')
-def prompt_mode(waste):
-    #choose the gamemode for the game
-    socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]), to= request.sid)
+def prompt_mode(sid):
+    print(f'starting for {sid}')
+    if sid == request.sid:
+        #choose the gamemode for the game
+        socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]), to= request.sid)
 
-    game = Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid)
+        game = Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid)
 
-    print("STARTING GAME FOR " + str(request.sid))
-    mode = None
-    if game_mode == "solo":
-        mode = game.play_solo
-    elif game_mode == "train":
-        mode = game.train_AI
-    elif game_mode.split("/")[0] == "winner":
+        print("STARTING GAME FOR " + str(request.sid))
+        mode = None
+        if game_mode == "solo":
+            mode = game.play_solo
+        elif game_mode == "train":
+            mode = game.train_AI
+        elif game_mode.split("/")[0] == "winner":
 
-        if game_mode.split("/")[1] == "record":
-            mode = game.replay_genome
-        else:
-            mode = game.replay_local_genome
+            if game_mode.split("/")[1] == "record":
+                mode = game.replay_genome
+            else:
+                mode = game.replay_local_genome
 
-    mode()
+        mode()
 
 
 

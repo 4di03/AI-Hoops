@@ -13,13 +13,16 @@ $(document).ready(function(){
 
     var gameWidth = null;
     var gameHeight = null;
+    socket.on('connect' , function(){
 
+
+    
     //to quit any previous sessions
-    socket.emit("quit", socket.id);
+    // socket.emit("quit", socket.id);
 
     mode = window.location.href.split('#')[-1]
 
-    socket.emit('start', "");
+    socket.emit('start', socket.id);
 
     var start = new Date();
 
@@ -202,10 +205,10 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
     document.addEventListener('keydown', function(event) {
         if(event.key == "a") {
-           socket.emit("input", "left");
+           socket.emit("input", "left#"+socket.id);
         }
         else if(event.key == "d") {
-            socket.emit("input", "right");
+            socket.emit("input", "right#"+socket.id);
         } else if (event.key == "m"){
 
             returnToMenu()
@@ -253,5 +256,5 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
             returnToMenu()
         }
     }, false);
-
+    });
 });

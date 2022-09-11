@@ -137,7 +137,7 @@ class Game:
             
         run = len(self.balls)
         while run:
-            print(f"running game for {request.sid}")
+            # print(f"running game for {request.sid}")
 
             global bboxes
             time.tick(ticks)
@@ -145,10 +145,16 @@ class Game:
             if len(nets) == 0 and len(ge) == 0:
                 @socket.on('input')
                 def make_move(input):
-                    if input == "right" and len(self.balls) > 0:
-                        ball.jump(True)
-                    elif input == "left" and len(self.balls) > 0:
-                        ball.jump(False)
+                    input,sid= input.split("#")
+                    if sid == request.sid:
+                        if input == "right" and len(self.balls) > 0:
+                            self.balls[0].jump(True)
+                            print(f"move for {request.sid}, {ball}")
+
+                        elif input == "left" and len(self.balls) > 0:
+                            self.balls[0].jump(False)
+                            print(f"move for {request.sid}, {ball}")
+
 
 
             @socket.on('quit')
