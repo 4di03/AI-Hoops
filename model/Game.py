@@ -1,3 +1,4 @@
+import re
 import eventlet
 eventlet.monkey_patch()
 from lib2to3.pytree import generate_matches
@@ -16,8 +17,22 @@ import random
 from flask import request, copy_current_request_context
 # from application import config_data, create_config_file
 
-kill = False
 socket = None
+
+game_map = {}
+
+#only for solo mode
+def make_move(input):
+    input,sid= input.split("#")
+    game = game_map[sid]
+
+    # print(f'trying to move, SID: {sid}, request.id: {request.sid}, game: {game}, true game socketid: {game.name}')
+    if sid == request.sid and sid == game.name:
+        if input == "right" and len(game.balls) > 0:
+            game.balls[0].jump(True)
+
+        elif input == "left" and len(game.balls) > 0:
+            game.balls[0].jump(False)
 
 
 class Game:
@@ -81,7 +96,6 @@ class Game:
 
 
     def train_AI(self, display = False):
-        global kill
         self.config_path = "./model/config.txt"
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
@@ -97,13 +111,13 @@ class Game:
         winner = p.run(self.main, self.max_gens)
 
 
-        if self.override_winner and not kill:
+        if self.override_winner and not self.kill:
             print("overriding local winner")
             with open("model/local_winner.pkl", "wb") as f:
                 pickle.dump(winner, f)
                 f.close()
 
-        kill = False
+        self.kill = False
 
     def emit_data(self,name, socket):
 
@@ -116,21 +130,13 @@ class Game:
 
 
     def play_solo(self):
-        print("PLAYING SOLO")
         Ball(self)
         self.main([],None,250)
 
-    #only for solo mode
-    def make_move(self, input):
-        input,sid= input.split("#")
-        if sid == request.sid:
-            if input == "right" and len(self.balls) > 0:
-                self.balls[0].jump(True)
 
-            elif input == "left" and len(self.balls) > 0:
-                self.balls[0].jump(False)
 
     def main(self, genomes, config, ticks = 250, display = False):
+        global game_map
         nets = []
         ge = []
 
@@ -145,32 +151,29 @@ class Game:
         time = pygame.time.Clock()
             
         run = len(self.balls)
+        self.name = request.sid
+        game_map[request.sid] = self
         while run:
             # print(f"running game for {request.sid}")
-            # if random.randint(0,100) == 42:
-            #     print(self)
+            if random.randint(0,100) == 42:
+                print(self)
             global bboxes
             time.tick(ticks)
             if len(nets) == 0 and len(ge) == 0:
                 # @socket.on('input')
                 # print(f"move for {request.sid}, {self}")
-                socket.on_event('input', self.make_move)
-
-
+                socket.on_event('input', make_move)
 
             @socket.on('quit')
             def quit_game(sid):
-
-                print("Quitting for " + sid)
-                if sid == request.sid:
-                    global kill
-                    print("QUITTING", genomes)
+                # print(f'trying to quit, SID: {sid}, request.id: {request.sid}, game: {self}, true game socketid: {self.name}')
+                game = game_map[sid]
+                if sid == request.sid and sid == game.name:
+                    # print("Quitting for " + sid +", " + str(self))
                     if ge:
-                        print("killing mode")
                         ge[0].fitness = sys.maxsize
-                        kill = True
-                    self.balls = []
-
+                        game.kill = True
+                    game.balls = []
 
             i = len(self.balls) - 1
             while i >= 0:

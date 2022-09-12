@@ -16,9 +16,9 @@ $(document).ready(function(){
     socket.on('connect' , function(){
 
 
-    
+    console.log("emmting quit to " + socket.id)
     //to quit any previous sessions
-    // socket.emit("quit", socket.id);
+    socket.emit("quit", socket.id);
 
     mode = window.location.href.split('#')[-1]
 
@@ -103,7 +103,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
         ctx.canvas.width  = window.innerWidth;
         ctx.canvas.height = window.innerHeight;
-        console.log(objects)
+        // console.log(objects)
 
         objects = JSON.parse(objects);
         for (i = 0; i < objects.length ; i += 1){
@@ -194,7 +194,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
         drawQuitButton(rect)
         
-
+        ctx.fillText(socket.id + ": "  + secondsElapsed,.6*canvas.width, .1*canvas.height);
 
     }
 

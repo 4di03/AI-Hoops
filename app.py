@@ -137,14 +137,14 @@ def recieve_mode(mode):
 @socketio.on('start')
 def prompt_mode(sid):
     global games
-    print(f'starting for {sid}')
+    # print(f'starting for {sid} with current request.id: {request.sid}')
     if sid == request.sid:
         #choose the gamemode for the game
         socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]), to= request.sid)
 
         games.append(Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid))
 
-        print("STARTING GAME FOR " + str(request.sid))
+        # print("STARTING GAME FOR " + str(request.sid))
         mode = None
         if game_mode == "solo":
             mode = games[-1].play_solo
