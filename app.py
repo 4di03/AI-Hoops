@@ -25,6 +25,7 @@ game_mode= ""
 
 config_data = {}
 
+games = []
 
 cfg_parser = configparser.ConfigParser()
 
@@ -135,25 +136,26 @@ def recieve_mode(mode):
 
 @socketio.on('start')
 def prompt_mode(sid):
+    global games
     print(f'starting for {sid}')
     if sid == request.sid:
         #choose the gamemode for the game
         socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]), to= request.sid)
 
-        game = Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid)
+        games.append(Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid))
 
         print("STARTING GAME FOR " + str(request.sid))
         mode = None
         if game_mode == "solo":
-            mode = game.play_solo
+            mode = games[-1].play_solo
         elif game_mode == "train":
-            mode = game.train_AI
+            mode = games[-1].train_AI
         elif game_mode.split("/")[0] == "winner":
 
             if game_mode.split("/")[1] == "record":
-                mode = game.replay_genome
+                mode = games[-1].replay_genome
             else:
-                mode = game.replay_local_genome
+                mode = games[-1].replay_local_genome
 
         mode()
 

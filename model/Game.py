@@ -12,6 +12,7 @@ from model.Image import Image, Button
 from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG
 import json 
 import sys 
+import random
 from flask import request, copy_current_request_context
 # from application import config_data, create_config_file
 
@@ -119,7 +120,15 @@ class Game:
         Ball(self)
         self.main([],None,250)
 
+    #only for solo mode
+    def make_move(self, input):
+        input,sid= input.split("#")
+        if sid == request.sid:
+            if input == "right" and len(self.balls) > 0:
+                self.balls[0].jump(True)
 
+            elif input == "left" and len(self.balls) > 0:
+                self.balls[0].jump(False)
 
     def main(self, genomes, config, ticks = 250, display = False):
         nets = []
@@ -138,22 +147,14 @@ class Game:
         run = len(self.balls)
         while run:
             # print(f"running game for {request.sid}")
-
+            # if random.randint(0,100) == 42:
+            #     print(self)
             global bboxes
             time.tick(ticks)
-            
             if len(nets) == 0 and len(ge) == 0:
-                @socket.on('input')
-                def make_move(input):
-                    input,sid= input.split("#")
-                    if sid == request.sid:
-                        if input == "right" and len(self.balls) > 0:
-                            self.balls[0].jump(True)
-                            print(f"move for {request.sid}, {ball}")
-
-                        elif input == "left" and len(self.balls) > 0:
-                            self.balls[0].jump(False)
-                            print(f"move for {request.sid}, {ball}")
+                # @socket.on('input')
+                print(f"move for {request.sid}, {self}")
+                socket.on_event('input', self.make_move)
 
 
 
