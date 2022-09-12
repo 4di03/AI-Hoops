@@ -155,8 +155,7 @@ class Game:
         game_map[request.sid] = self
         while run:
             # print(f"running game for {request.sid}")
-            if random.randint(0,100) == 42:
-                print(self)
+     
             global bboxes
             time.tick(ticks)
             if len(nets) == 0 and len(ge) == 0:

@@ -34,7 +34,7 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 1200000
+ALLOWED_TIME = 1200
 
 font = pygame.font.SysFont('Comic Sans MS', 10)
 
