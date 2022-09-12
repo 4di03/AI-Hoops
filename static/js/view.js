@@ -194,7 +194,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
         drawQuitButton(rect)
         
-        ctx.fillText(socket.id + ": "  + secondsElapsed,.6*canvas.width, .1*canvas.height);
+        //lText(socket.id + ": "  + secondsElapsed,.6*canvas.width, .1*canvas.height);
 
     }
 
