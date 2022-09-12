@@ -153,7 +153,7 @@ class Game:
             time.tick(ticks)
             if len(nets) == 0 and len(ge) == 0:
                 # @socket.on('input')
-                print(f"move for {request.sid}, {self}")
+                # print(f"move for {request.sid}, {self}")
                 socket.on_event('input', self.make_move)
 
 
