@@ -43,7 +43,7 @@ GEN = 0
 BBOX_WIDTH = 10
 BBOX_HEIGHT = 10
 
-HORIZONTAL_VEL = 3
+HORIZONTAL_VEL = 3.5
 ACC = 0.1
 
 class BBox:
@@ -118,7 +118,7 @@ class Ball:
         else:
             self.x_vel = -HORIZONTAL_VEL
 
-        self.y_vel = -1.2
+        self.y_vel = -1.4
         self.time = 0
 
     def move(self, nets , ge ,i,game):
