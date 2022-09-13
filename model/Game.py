@@ -131,11 +131,11 @@ class Game:
 
     def play_solo(self):
         Ball(self)
-        self.main([],None,250)
+        self.main([],None)
 
 
 
-    def main(self, genomes, config, ticks = 250, display = False):
+    def main(self, genomes, config, ticks = 120, display = False):
         global game_map
         nets = []
         ge = []

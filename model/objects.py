@@ -43,6 +43,9 @@ GEN = 0
 BBOX_WIDTH = 10
 BBOX_HEIGHT = 10
 
+HORIZONTAL_VEL = 3
+ACC = 0.1
+
 class BBox:
     def __init__(self, x, y, height = BBOX_HEIGHT, width = BBOX_WIDTH, passable = False):
         self.x = x
@@ -85,7 +88,7 @@ class Ball:
         self.y = (WIN_HEIGHT/2) - BALL_SIZE
         self.x_vel = 0
         self.y_vel = 0
-        self.y_acc = 0.1
+        self.y_acc = ACC
         self.hoop = Hoop(game)
         self.time = 0
         self.mask = pygame.mask.from_surface(BALL_IMG)
@@ -111,11 +114,11 @@ class Ball:
     def jump(self, right):
 
         if right:
-            self.x_vel = 2
+            self.x_vel = HORIZONTAL_VEL
         else:
-            self.x_vel = -2
+            self.x_vel = -HORIZONTAL_VEL
 
-        self.y_vel = -1.3
+        self.y_vel = -1.2
         self.time = 0
 
     def move(self, nets , ge ,i,game):
