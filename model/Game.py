@@ -135,7 +135,7 @@ class Game:
 
 
 
-    def main(self, genomes, config, ticks = 120, display = False):
+    def main(self, genomes, config, ticks = 60, display = False):
         global game_map
         nets = []
         ge = []
