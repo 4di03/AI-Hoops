@@ -21,6 +21,10 @@ socket = None
 
 game_map = {}
 
+DEFAULT_FPS = 60
+
+CHOSEN_FPS = 60
+
 #only for solo mode
 def make_move(input):
     input,sid= input.split("#")
@@ -108,6 +112,9 @@ class Game:
         stats = neat.StatisticsReporter()
         p.add_reporter(stats)
 
+        def fast_main(genomes, config):
+            self.main(genomes,config, ticks = CHOSEN_FPS)
+
         winner = p.run(self.main, self.max_gens)
 
 
@@ -135,7 +142,7 @@ class Game:
 
 
 
-    def main(self, genomes, config, ticks = 60, display = False):
+    def main(self, genomes, config, ticks = DEFAULT_FPS, display = False):
         global game_map
         nets = []
         ge = []
