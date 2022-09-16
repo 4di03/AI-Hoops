@@ -99,7 +99,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
         messagesRecieved += 1
         let secondsElapsed = (new Date() - start)/1000;
 
-
+        console.log("Average seconds: "+ (messagesRecieved / secondsElapsed).toString())
 
         ctx.canvas.width  = window.innerWidth;
         ctx.canvas.height = window.innerHeight;

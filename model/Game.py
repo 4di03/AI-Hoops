@@ -14,6 +14,7 @@ from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE
 import json 
 import sys 
 import random
+import time
 from flask import request, copy_current_request_context
 # from application import config_data, create_config_file
 
@@ -21,9 +22,9 @@ socket = None
 
 game_map = {}
 
-DEFAULT_FPS = 60
+DEFAULT_FPS = 250
 
-CHOSEN_FPS = 60
+CHOSEN_FPS = 100
 
 #only for solo mode
 def make_move(input):
@@ -75,7 +76,7 @@ class Game:
     def replay_local_genome(self):
         self.replay_genome(genome_path='model/local_winner.pkl')
     
-    def replay_genome(self, ticks = 250, genome_path="model/best_winner.pkl"):
+    def replay_genome(self, framerate = DEFAULT_FPS, genome_path="model/best_winner.pkl"):
         # Load requried NEAT config
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
 
@@ -87,7 +88,7 @@ class Game:
         genomes = [(1, genome)]
 
         # Call game with only the loaded genome
-        self.main(genomes, config, ticks,socket)
+        self.main(genomes, config, framerate,socket)
 
 
     
@@ -113,7 +114,7 @@ class Game:
         p.add_reporter(stats)
 
         def fast_main(genomes, config):
-            self.main(genomes,config, ticks = CHOSEN_FPS)
+            self.main(genomes,config, framerate = CHOSEN_FPS)
 
         winner = p.run(self.main, self.max_gens)
 
@@ -142,7 +143,7 @@ class Game:
 
 
 
-    def main(self, genomes, config, ticks = DEFAULT_FPS, display = False):
+    def main(self, genomes, config, framerate = DEFAULT_FPS, display = False):
         global game_map
         nets = []
         ge = []
@@ -155,16 +156,28 @@ class Game:
             g.fitness = 0
             ge.append(g)
 
-        time = pygame.time.Clock()
+        pyClock = pygame.time.Clock()
             
         run = len(self.balls)
         self.name = request.sid
         game_map[request.sid] = self
+
+        last_time = time.time()
+
+        frame_ct = 0
+
+
         while run:
+            
+            frame_ct += 1
+            #time since last frame in frames to base game (250 fps)
+            dt = (time.time() - last_time) * DEFAULT_FPS
+            last_time = time.time()
+
             # print(f"running game for {request.sid}")
      
             global bboxes
-            time.tick(ticks)
+            pyClock.tick(framerate)
             if len(nets) == 0 and len(ge) == 0:
                 # @socket.on('input')
                 # print(f"move for {request.sid}, {self}")
@@ -186,11 +199,12 @@ class Game:
 
                 ball = self.balls[i]
 
-                ball.move(nets, ge , i, self)
+                ball.move(nets, ge , i, self, dt)
 
                 i -= 1
 
-            self.emit_data("screen", socket)
+            if (frame_ct % (int(framerate/CHOSEN_FPS))) == 0:
+                self.emit_data("screen", socket)
 
 
 

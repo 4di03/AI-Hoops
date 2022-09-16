@@ -1,6 +1,7 @@
 #from grpc import xds_server_credentials
 # from inspect import GEN_CLOSED
 # from ipaddress import _IPAddressBase
+from faulthandler import dump_traceback
 from operator import truediv
 import pygame
 
@@ -34,7 +35,7 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 400
+ALLOWED_TIME = 1200
 
 font = pygame.font.SysFont('Comic Sans MS', 10)
 
@@ -43,7 +44,7 @@ GEN = 0
 BBOX_WIDTH = 10
 BBOX_HEIGHT = 10
 
-HORIZONTAL_VEL = 3.5
+HORIZONTAL_VEL = 2
 ACC = 0.1
 
 class BBox:
@@ -118,10 +119,10 @@ class Ball:
         else:
             self.x_vel = -HORIZONTAL_VEL
 
-        self.y_vel = -1.4
+        self.y_vel = -1.3
         self.time = 0
 
-    def move(self, nets , ge ,i,game):
+    def move(self, nets , ge ,i,game, dt):
         self.tick0 += 1
         
         self.tick -= 1
@@ -137,24 +138,26 @@ class Ball:
 
 
         for bbox in self.hoop.rim.bboxes:
-            self.collide(bbox, ge, i)
+            self.collide(bbox, ge, i, dt)
 
-        self.collide(ground,ge , i)
+        self.collide(ground,ge , i, dt)
 
-        self.time += .25
+        self.time += .25 
 
 
-        self.x += self.x_vel
+        self.x +=  self.x_vel * dt
 
         if (self.x <= -BALL_SIZE):
             self.x = WIN_WIDTH - BALL_SIZE
         elif(self.x > WIN_WIDTH):
             self.x = 0
 
-        dy =  self.y_vel * self.time + (self.y_acc) * (self.time ** 2)
+        
+
+        dy =  self.y_vel* self.time + (self.y_acc) * (self.time ** 2)
 
 
-        self.y += dy
+        self.y +=  dy *dt
 
         self.img.update(self.x, self.y)
 
@@ -173,7 +176,7 @@ class Ball:
                 elif x == 1:
                     self.jump(False)
 
-    def collide(self, bbox, ge, i):
+    def collide(self, bbox, ge, i, dt):
        col_point = self.mask.overlap(bbox.mask, (bbox.x - self.x, bbox.y-self.y)) 
        if col_point != None:
             
@@ -193,8 +196,8 @@ class Ball:
                 else:
                     self.x_vel *= -1
                     self.y_vel *= -1
-                    self.x += 10 * self.x_vel
-                    self.y += 10 * self.y_vel    
+                    self.x += 10 * self.x_vel * dt
+                    self.y += 10 * self.y_vel *dt
 
                 self.time = 0
 
