@@ -32,7 +32,7 @@ def make_move(input):
     game = game_map[sid]
 
     # print(f'trying to move, SID: {sid}, request.id: {request.sid}, game: {game}, true game socketid: {game.name}')
-    if sid == request.sid and sid == game.name:
+    if sid == request.sid and sid == game.name and game.solo:
         if input == "right" and len(game.balls) > 0:
             game.balls[0].jump(True)
 
@@ -54,6 +54,7 @@ class Game:
         self.kill = False
         self.net_type = neat.nn.FeedForwardNetwork
         socket = socketio
+        self.solo = False
         if custom_config:
             self.max_gens = int(custom_config["max_gens"])
             if "Feed-Forward NN" in custom_config:
@@ -139,6 +140,7 @@ class Game:
 
     def play_solo(self):
         Ball(self)
+        self.solo = True
         self.main([],None)
 
 
@@ -178,10 +180,8 @@ class Game:
      
             global bboxes
             pyClock.tick(framerate)
-            if len(nets) == 0 and len(ge) == 0:
-                # @socket.on('input')
-                # print(f"move for {request.sid}, {self}")
-                socket.on_event('input', make_move)
+            
+            socket.on_event('input', make_move)
 
             @socket.on('quit')
             def quit_game(sid):
