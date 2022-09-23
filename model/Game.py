@@ -126,6 +126,18 @@ class Game:
                 pickle.dump(winner, f)
                 f.close()
 
+            cur_highscore = int(open("model/highscore.txt", mode="rt").read())
+            if winner.fitness > cur_highscore:
+                with open("model/highscore.txt", mode = "w") as h:
+                    h.write(winner.fitness)
+                
+                print("overriding record winner")
+
+                with open("model/best_winner.pkl", "wb") as f:
+                    pickle.dump(winner, f)
+                    f.close()
+
+
         self.kill = False
 
     def emit_data(self,name, socket):

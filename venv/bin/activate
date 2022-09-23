@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/adithyapalle/Desktop/work/python/ml/GameAI/webpage/venv"
+VIRTUAL_ENV="/Users/adithyapalle/Desktop/work/python/ml/GAME_AI/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
@@ -64,4 +64,5 @@ fi
 if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
     hash -r 2> /dev/null
 fi
+
 export EVENTLET_HUB=poll
