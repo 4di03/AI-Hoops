@@ -10,7 +10,7 @@ import neat
 import pickle
 from model.objects import Ball
 from model.Image import Image, Button
-from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG
+from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG, DEFAULT_FPS
 import json 
 import sys 
 import random
@@ -22,7 +22,6 @@ socket = None
 
 game_map = {}
 
-DEFAULT_FPS = 250
 
 CHOSEN_FPS = 100
 
@@ -185,7 +184,7 @@ class Game:
             
             frame_ct += 1
             #time since last frame in frames to base game (250 fps)
-            dt = (time.time() - last_time) * DEFAULT_FPS
+            dt = (time.time() - last_time) * DEFAULT_FPS 
             last_time = time.time()
 
             # print(f"running game for {request.sid}")

@@ -1,4 +1,3 @@
-
 var imageMap = new Map();
 
 // consider socket.on('connect', function(){});
@@ -13,6 +12,7 @@ $(document).ready(function(){
 
     var gameWidth = null;
     var gameHeight = null;
+    var gameArea = null;
     socket.on('connect' , function(){
 
 
@@ -33,6 +33,7 @@ $(document).ready(function(){
         dims = JSON.parse(msg);
         gameWidth = dims[0];
         gameHeight = dims[1];
+        gameArea = gameWidth * gameHeight;
 
         // ctx.fillStyle = "black";
         // ctx.fillRect(10,10,200,100);
@@ -40,11 +41,18 @@ $(document).ready(function(){
     });
 
     
-function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , rectColor = null){
+function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , rectColor = null, scaleByArea = false){
+    areaFactor = Math.sqrt((canvas.width * canvas.height)/gameArea);
 
-
+    if (scaleByArea){
+    widthFactor =  areaFactor;//canvas.width/gameWidth;
+    heightFactor = areaFactor;//canvas.height/gameHeight;
+    }
+    else{
+        
     widthFactor =  canvas.width/gameWidth;
     heightFactor = canvas.height/gameHeight;
+    }
     x = x * widthFactor;
     y = y * heightFactor;
     width = width * widthFactor;
@@ -99,7 +107,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
         messagesRecieved += 1
         let secondsElapsed = (new Date() - start)/1000;
 
-        console.log("Average seconds: "+ (messagesRecieved / secondsElapsed).toString())
+        console.log("Average messages per seconds: "+ (messagesRecieved / secondsElapsed).toString())
 
         ctx.canvas.width  = window.innerWidth;
         ctx.canvas.height = window.innerHeight;

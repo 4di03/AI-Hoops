@@ -12,6 +12,14 @@ from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
 import configparser
 from flask_cors import CORS
+import logging
+
+
+SHOW_FLASK_LOGS = False
+
+if not SHOW_FLASK_LOGS:
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 
