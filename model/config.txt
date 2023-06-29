@@ -1,7 +1,7 @@
 [NEAT]
 fitness_criterion = max
-fitness_threshold = 25050
-pop_size = 51
+fitness_threshold = 4104
+pop_size = 12
 reset_on_extinction = on
 
 [DefaultGenome]
@@ -20,8 +20,8 @@ bias_mutate_rate = 0.7
 bias_replace_rate = 0.1
 compatibility_disjoint_coefficient = 1.0
 compatibility_weight_coefficient = 0.5
-conn_add_prob = 0.5
-conn_delete_prob = 0.5
+conn_add_prob = 0.52
+conn_delete_prob = 0.56
 enabled_default = True
 enabled_mutate_rate = 0.1
 feed_forward = True
@@ -51,7 +51,7 @@ compatibility_threshold = 3.0
 
 [DefaultStagnation]
 species_fitness_func = max
-max_stagnation = 501
+max_stagnation = 146
 species_elitism = 0
 
 [DefaultReproduction]

@@ -10,7 +10,7 @@ import neat
 import pickle
 from model.objects import Ball
 from model.Image import Image, Button
-from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG, DEFAULT_FPS
+from  model.objects import WIN_HEIGHT, WIN_WIDTH, STAT_FONT, BALL_IMG, BALL_SIZE, BRAIN_BALL_IMG, BEST_BALL_IMG,  BG_IMG, TICKS_PER_SEC
 import json 
 import sys 
 import random
@@ -23,7 +23,7 @@ socket = None
 game_map = {}
 
 
-CHOSEN_FPS = 100
+CHOSEN_FPS = TICKS_PER_SEC
 
 #only for solo mode
 def make_move(input):
@@ -76,7 +76,7 @@ class Game:
     def replay_local_genome(self):
         self.replay_genome(genome_path='model/local_winner.pkl')
     
-    def replay_genome(self, framerate = DEFAULT_FPS, genome_path="model/best_winner.pkl"):
+    def replay_genome(self, framerate = TICKS_PER_SEC, genome_path="model/best_winner.pkl"):
         # Load requried NEAT config
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
 
@@ -156,7 +156,7 @@ class Game:
 
 
 
-    def main(self, genomes, config, framerate = DEFAULT_FPS, display = False):
+    def main(self, genomes, config, framerate = TICKS_PER_SEC, display = False):
         global game_map
         nets = []
         ge = []
@@ -184,7 +184,7 @@ class Game:
             
             frame_ct += 1
             #time since last frame in frames to base game (250 fps)
-            dt = (time.time() - last_time) * DEFAULT_FPS 
+            dt = (time.time() - last_time) * TICKS_PER_SEC 
             last_time = time.time()
 
             # print(f"running game for {request.sid}")
@@ -214,7 +214,7 @@ class Game:
 
                 i -= 1
 
-            if (frame_ct % (int(framerate/CHOSEN_FPS))) == 0:
+            if (frame_ct % (int(framerate/CHOSEN_FPS))) == 0: #only emit data for CHOSEN_FPS frames per second
                 self.emit_data("screen", socket)
 
 

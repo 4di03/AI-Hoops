@@ -14,8 +14,7 @@ import math
 WIN_WIDTH = 1920 # 800
 WIN_HEIGHT = 1080 # 500
 
-DEFAULT_FPS = 250
-
+TICKS_PER_SEC =  500
 
 BG_IMG = pygame.transform.scale( pygame.image.load("static/assets/bg.jpg"), (WIN_WIDTH, WIN_HEIGHT))
 
@@ -36,17 +35,19 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 1200
+ALLOWED_TIME = 3000 # time in ticks
 
 font = pygame.font.SysFont('Comic Sans MS', 10)
+
+AI_MOVE_INTERVAL = 50 # interval between AI moves in ticks
 
 GEN = 0
 MIN_VEL = 0.1
 BBOX_WIDTH = 10
 BBOX_HEIGHT = 10
 
-HORIZONTAL_VEL = 2 * 250/DEFAULT_FPS
-ACC = 0.01 * math.sqrt(250/DEFAULT_FPS)
+HORIZONTAL_VEL = 4 * 250/TICKS_PER_SEC
+ACC = 0.02 * math.sqrt(250/TICKS_PER_SEC)
 Y_VEL = -3 * math.sqrt(HORIZONTAL_VEL)/1.6
 PRINT_GRAVITY_TIME = False
 class BBox:
@@ -120,7 +121,9 @@ class Ball:
         #win.blit(text_surface2, (self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2 + 5))
 
     def jump(self, right):
-        print("JUMPING")
+        #print("JUMPING")
+        self.y_acc = ACC
+
         if right:
             self.x_vel = HORIZONTAL_VEL # set x velocity
         else:
@@ -152,6 +155,8 @@ class Ball:
             if nets and ge:
                 nets.pop(i) # remove net from game
                 ge.pop(i) # remove genome from game
+
+            print("GAME OVER")
             return
 
 
@@ -161,8 +166,8 @@ class Ball:
         self.collide(GROUND,ge , i, dt)
 
         self.time += .25 
-        # if self.tick0 % 60 == 0:
-        #     print("L153",f"y_vel: {self.y_vel}",f"x_vel:{self.x_vel}", f"y_acc: {self.y_acc}")
+        #if self.tick0 % 60 == 0:
+            #print("L153",f"y_vel: {self.y_vel}",f"x_vel:{self.x_vel}", f"y_acc: {self.y_acc}")
         self.x +=  self.x_vel * dt
 
         if (self.x <= -BALL_SIZE):
@@ -175,7 +180,9 @@ class Ball:
         #dy =  self.y_vel* dt + (self.y_acc) * (dt ** 2)
         #self.x_vel = self.damp_vel(self.x_vel, 1 - 0.01)
         self.update_y_vel(dt)
-        self.y +=  self.y_vel * dt
+
+        dy =  self.y_vel * dt
+        self.y +=  dy
 
         self.img.update(self.x, self.y)
 
@@ -270,7 +277,7 @@ class Ball:
 
         data["images"].append(self.img.to_list())
         data["images"].append(self.hoop.img.to_list())
-        data["text"].append([(self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2 - 10),"Score: " + str(self.score), (255,255,255),"12px Arial"])
+        data["text"].append([(self.x + BALL_SIZE/2 - (20 * BALL_SIZE/50), self.y+BALL_SIZE/2 - 0 * (BALL_SIZE/50)),"Score: " + str(self.score), (255,255,255),"12px Arial"])
 
         if PRINT_GRAVITY_TIME:
             data["text"].append([(self.x + BALL_SIZE/2 - 20, self.y+BALL_SIZE/2 + 5),"Time: " + str(self.time), (255,255,255),"12px Arial"])
