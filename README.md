@@ -18,3 +18,10 @@ https://nn.cs.utexas.edu/downloads/papers/stanley.cec02.pdf
 
 You can using the training section configure the neuroevolution process and craft the best AI that will be saved locally.
 If your AI beats the record of the globally best AI, it will replace it as the 'record best AI'!
+
+TODO:
+ - Death animation in Solo mode
+ - NEAT NN DISPLAY during training
+ - No Graphics Training
+ - Model saved indication
+   
