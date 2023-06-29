@@ -36,7 +36,7 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 1200000
+ALLOWED_TIME = 1200
 
 font = pygame.font.SysFont('Comic Sans MS', 10)
 
@@ -161,8 +161,8 @@ class Ball:
         self.collide(GROUND,ge , i, dt)
 
         self.time += .25 
-        if self.tick0 % 60 == 0:
-            print("L153",f"y_vel: {self.y_vel}",f"x_vel:{self.x_vel}", f"y_acc: {self.y_acc}")
+        # if self.tick0 % 60 == 0:
+        #     print("L153",f"y_vel: {self.y_vel}",f"x_vel:{self.x_vel}", f"y_acc: {self.y_acc}")
         self.x +=  self.x_vel * dt
 
         if (self.x <= -BALL_SIZE):
