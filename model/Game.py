@@ -30,7 +30,7 @@ class DataEmitter(ABC):
     of a certain type from server to client.
     '''
 
-    def __init__(self,game, name, socket):
+    def __init__(self,game, name):
         '''
         args:
             game: an instance of Game
