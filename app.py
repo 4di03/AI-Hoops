@@ -153,7 +153,7 @@ def prompt_mode(sid):
 
         g = Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid)
 
-        gc = GameController(Game)
+        gc = GameController(g)
         games.append(gc)
 
         # print("STARTING GAME FOR " + str(request.sid))
