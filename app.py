@@ -13,7 +13,7 @@ import json
 import configparser
 from flask_cors import CORS
 import logging
-
+import time
 
 SHOW_FLASK_LOGS = False
 
@@ -169,7 +169,10 @@ def prompt_mode(sid):
             else:
                 mode = games[-1].replay_local_genome
 
+
+        start_t = time.time()
         mode()
+        print("L175, seconds till game end: ", time.time() - start_t)
 
 
 
