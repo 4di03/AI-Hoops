@@ -296,6 +296,8 @@ class GameController:
                         game.kill = True
                     game.balls = []
 
+
+            print(tick_ct, int(TICKS_PER_SEC/self.framerate))
             if display and (tick_ct % (int(TICKS_PER_SEC/self.framerate))) == 0: #only emit data for self.game.framerate frames per second
                 emit_name = 'screen'
 
