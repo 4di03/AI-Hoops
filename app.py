@@ -172,9 +172,10 @@ def prompt_mode(sid):
 
         start_t = time.time()
         print("L174, STARTING GAME: ")
-
-        mode()
-        print("L175, seconds till game end: ", time.time() - start_t)
+        try:
+            mode()
+        except Exception:
+            print("L175, seconds till game end: ", time.time() - start_t)
 
 
 
