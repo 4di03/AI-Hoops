@@ -132,7 +132,7 @@ class Game:
 
         self.gen = 0
 
-    def run_frame(self, pyClock, nets, ge):
+    def run_frame(self, pyClock, nets, ge, last_time = 0):
         '''
         Moves all balls in game in a single frame
         args:
@@ -148,7 +148,6 @@ class Game:
 
         #time since last frame in frames to base game (250 fps)
         dt = (time.time() - last_time) * TICKS_PER_SEC 
-        last_time = time.time()
 
         # print(f"running game for {request.sid}")
     
@@ -272,16 +271,14 @@ class GameController:
         run = len(self.game.balls)
         self.game.name = request.sid
         game_map[request.sid] = self.game
-
-        last_time = time.time()
-
         frame_ct = 0
 
 
         while run:
+            last_time = time.time()
             frame_ct += 1
 
-            self.game.run_frame(pyClock, nets , ge)
+            self.game.run_frame(pyClock, nets , ge, last_time = last_time)
 
             socket.on_event('input', make_move)
 
