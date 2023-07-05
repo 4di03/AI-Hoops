@@ -269,7 +269,7 @@ class GameController:
 
         pyClock = pygame.time.Clock()
             
-        run = len(self.balls)
+        run = len(self.game.balls)
         self.game.name = request.sid
         game_map[request.sid] = self.game
 
