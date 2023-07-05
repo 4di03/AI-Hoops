@@ -46,9 +46,9 @@ MIN_VEL = 0.1
 BBOX_WIDTH = 10
 BBOX_HEIGHT = 10
 
-HORIZONTAL_VEL = 4 * 250/TICKS_PER_SEC
-ACC = 0.02 * math.sqrt(250/TICKS_PER_SEC)
-Y_VEL = -3 * math.sqrt(HORIZONTAL_VEL)/1.6
+HORIZONTAL_VEL = 4 * 250/TICKS_PER_SEC # speed per tick
+ACC = 0.02 * math.sqrt(250/TICKS_PER_SEC) # acc per tick
+Y_VEL = -3 * math.sqrt(HORIZONTAL_VEL)/1.6 # speed per tick
 PRINT_GRAVITY_TIME = False
 class BBox:
     def __init__(self, x, y, height = BBOX_HEIGHT, width = BBOX_WIDTH, passable = False):

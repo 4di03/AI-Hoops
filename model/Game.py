@@ -103,10 +103,13 @@ class Game:
     config_path = "./model/config.txt"
 
 
-    def __init__(self, custom_config, socketio,framerate = TICKS_PER_SEC, name = "no name"):
+    def __init__(self, custom_config, socketio,name = "no name"):
+        '''
+        args:
+            framerate: How frequently
+        '''
         global socket
         self.name = name
-        self.framerate = framerate
         self.balls = []
         self.images = []
         self.show_display_options = False
@@ -146,12 +149,11 @@ class Game:
 
             return
 
-        #time since last frame in frames to base game (250 fps)
+        #time since last tick in ticks to base game (250 fps)
         dt = (time.time() - last_time) * TICKS_PER_SEC 
 
         # print(f"running game for {request.sid}")
     
-        pyClock.tick(self.framerate)
         
 
         i = len(self.balls) - 1
@@ -168,11 +170,12 @@ class GameController:
     '''
     Controller for Game object, runs the game , takes input, and runs NEAT after every frame.
     '''
-    def __init__(self, game):
+    def __init__(self, game, framerate = TICKS_PER_SEC):
 
         self.game = game
 
-    
+        self.framerate = framerate
+
     def replay_local_genome(self):
         self.replay_genome(genome_path='model/local_winner.pkl')
     
@@ -271,12 +274,12 @@ class GameController:
         run = len(self.game.balls)
         self.game.name = request.sid
         game_map[request.sid] = self.game
-        frame_ct = 0
+        tick_ct = 0
 
 
         while run:
             last_time = time.time()
-            frame_ct += 1
+            tick_ct += 1
 
             self.game.run_frame(pyClock, nets , ge, last_time = last_time)
 
@@ -293,7 +296,7 @@ class GameController:
                         game.kill = True
                     game.balls = []
 
-            if display and (frame_ct % (int(self.framerate/CHOSEN_FPS))) == 0: #only emit data for CHOSEN_FPS frames per second
+            if display and (tick_ct % (int(TICKS_PER_SEC/self.framerate))) == 0: #only emit data for self.game.framerate frames per second
                 emit_name = 'screen'
 
                 emitter = ScreenDataEmitter(self.game, name = emit_name)
