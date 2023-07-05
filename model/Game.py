@@ -305,5 +305,5 @@ class GameController:
 
                 emitter = StdoutDataEmitter(self.game, name = emit_name)
             
-            emitter.emit_data(socket= socket, name = emit_name)
+            emitter.emit_data(socket= socket)
 
