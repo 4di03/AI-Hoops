@@ -7,7 +7,7 @@ from flask_socketio import SocketIO, emit
 from flask import Flask, render_template, url_for, copy_current_request_context, request
 from random import random
 from threading import Thread, Event
-from model.Game import Game
+from model.Game import Game, GameController
 from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
 import configparser
@@ -150,7 +150,11 @@ def prompt_mode(sid):
         #choose the gamemode for the game
         socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]), to= request.sid)
 
-        games.append(Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid))
+
+        g = Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid)
+
+        gc = GameController(Game)
+        games.append(gc)
 
         # print("STARTING GAME FOR " + str(request.sid))
         mode = None

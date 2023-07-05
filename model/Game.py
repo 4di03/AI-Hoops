@@ -16,12 +16,72 @@ import sys
 import random
 import time
 from flask import request, copy_current_request_context
+from abc import ABC, abstractmethod
 # from application import config_data, create_config_file
 
 socket = None
 
 game_map = {}
 
+
+class DataEmitter(ABC):
+    '''
+    Abstract FunctionObject for emitting json data 
+    of a certain type from server to client.
+    '''
+
+    def __init__(self,game, name, socket):
+        '''
+        args:
+            game: an instance of Game
+            name: name of even to emit to client
+        '''
+        self.game = game
+        self.name = name
+
+    @abstractmethod
+    def get_data(self):
+        '''
+        returns json data to emit to client
+        args:  
+            game: an instance of Game
+        '''
+        raise NotImplementedError
+
+    def emit_data(self,socket):
+        '''
+        emits data to client.
+        args:
+            name: name of event to emit to client
+            socket: SocketIO object
+            game: Game object
+        '''
+        socket.emit(self.name,self.get_data(), to = request.sid)
+        socket.sleep(0)
+
+
+class ScreenDataEmitter(DataEmitter):
+
+
+    def get_data(self):
+        '''
+        Gets jsonified screen data to emit to client
+        '''
+        balls_data = []
+        for ball in self.game.balls:
+            balls_data.append(ball.get_data())
+
+        return json.dumps(balls_data)
+
+
+class StdoutDataEmitter(DataEmitter):
+
+    def get_data(self):
+        '''
+        Get data from server stdout as string into json format
+        '''
+
+        return json.dumps(sys.stdout.getvalue())
 
 CHOSEN_FPS = TICKS_PER_SEC
 
@@ -43,9 +103,10 @@ class Game:
     config_path = "./model/config.txt"
 
 
-    def __init__(self, custom_config, socketio, name = "no name"):
+    def __init__(self, custom_config, socketio,framerate = TICKS_PER_SEC, name = "no name"):
         global socket
         self.name = name
+        self.framerate = framerate
         self.balls = []
         self.images = []
         self.show_display_options = False
@@ -71,14 +132,57 @@ class Game:
 
         self.gen = 0
 
- 
+    def run_frame(self, pyClock, nets, ge):
+        '''
+        Moves all balls in game in a single frame
+        args:
+            pyClock: pygame clock object
+            nets: list of neural networks
+            ge: list of genomes
+        '''
+
+        if len(self.balls) == 0:
+            self.__init__(self.custom_config, socket)
+
+            return
+
+        #time since last frame in frames to base game (250 fps)
+        dt = (time.time() - last_time) * TICKS_PER_SEC 
+        last_time = time.time()
+
+        # print(f"running game for {request.sid}")
+    
+        pyClock.tick(self.framerate)
+        
+
+        i = len(self.balls) - 1
+        while i >= 0:
+
+            ball = self.balls[i]
+
+            ball.move(nets, ge , i, self, dt)
+
+            i -= 1
+
+
+class GameController:
+    '''
+    Controller for Game object, runs the game , takes input, and runs NEAT after every frame.
+    '''
+    def __init__(self, game):
+
+        self.game = game
+
     
     def replay_local_genome(self):
         self.replay_genome(genome_path='model/local_winner.pkl')
     
     def replay_genome(self, framerate = TICKS_PER_SEC, genome_path="model/best_winner.pkl"):
         # Load requried NEAT config
-        config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
+        config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
+                                    neat.DefaultSpeciesSet, 
+                                    neat.DefaultStagnation, 
+                                    self.game.config_path)
 
         # Unpickle saved winner
         with open(genome_path, "rb") as f:
@@ -101,9 +205,9 @@ class Game:
 
 
     def train_AI(self, display = False):
-        self.config_path = "./model/config.txt"
+        self.game.config_path = "./model/config.txt"
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
-            neat.DefaultSpeciesSet, neat.DefaultStagnation, self.config_path)
+            neat.DefaultSpeciesSet, neat.DefaultStagnation, self.game.config_path)
         
 
         p = neat.Population(config)
@@ -113,13 +217,13 @@ class Game:
         stats = neat.StatisticsReporter()
         p.add_reporter(stats)
 
-        def fast_main(genomes, config):
-            self.main(genomes,config, framerate = CHOSEN_FPS)
+        # def fast_main(genomes, config):
+        #     self.main(genomes,config, framerate = CHOSEN_FPS)
 
-        winner = p.run(self.main, self.max_gens)
+        winner = p.run(self.main, self.game.max_gens)
 
 
-        if self.override_winner and not self.kill:
+        if self.game.override_winner and not self.game.kill:
             print("overriding local winner")
             with open("model/local_winner.pkl", "wb") as f:
                 pickle.dump(winner, f)
@@ -137,43 +241,37 @@ class Game:
                     f.close()
 
 
-        self.kill = False
-
-    def emit_data(self,name, socket):
-
-        balls_data = []
-        for ball in self.balls:
-            balls_data.append(ball.get_data())
-
-        socket.emit(name,json.dumps(balls_data), to = request.sid)
-        socket.sleep(0)
+        self.game.kill = False
 
 
     def play_solo(self):
-        Ball(self)
-        self.solo = True
+        Ball(self.game)
+        self.game.solo = True
         self.main([],None)
 
 
-
-    def main(self, genomes, config, framerate = TICKS_PER_SEC, display = False):
+    def main(self, genomes, config,  display = True):
+        '''
+        main method for the game, runs the game loop and emits screen data to client
+        args:
+            display: whether or not to emit screen data to client, if False, emit stdout string buffer to client
+        '''
         global game_map
-        nets = []
-        ge = []
-
+        nets = [] # list of neural networks
+        ge = [] # list of genomes
 
         for genome_id , g in genomes:
-            net = self.net_type.create(g, config)
+            net = self.game.net_type.create(g, config)
             nets.append(net)
-            Ball(self)
+            Ball(self.game)
             g.fitness = 0
             ge.append(g)
 
         pyClock = pygame.time.Clock()
             
         run = len(self.balls)
-        self.name = request.sid
-        game_map[request.sid] = self
+        self.game.name = request.sid
+        game_map[request.sid] = self.game
 
         last_time = time.time()
 
@@ -181,17 +279,10 @@ class Game:
 
 
         while run:
-            
             frame_ct += 1
-            #time since last frame in frames to base game (250 fps)
-            dt = (time.time() - last_time) * TICKS_PER_SEC 
-            last_time = time.time()
 
-            # print(f"running game for {request.sid}")
-     
-            global bboxes
-            pyClock.tick(framerate)
-            
+            self.game.run_frame(pyClock, nets , ge)
+
             socket.on_event('input', make_move)
 
             @socket.on('quit')
@@ -205,21 +296,14 @@ class Game:
                         game.kill = True
                     game.balls = []
 
-            i = len(self.balls) - 1
-            while i >= 0:
+            if display and (frame_ct % (int(self.framerate/CHOSEN_FPS))) == 0: #only emit data for CHOSEN_FPS frames per second
+                emit_name = 'screen'
 
-                ball = self.balls[i]
+                emitter = ScreenDataEmitter(self.game, name = emit_name)
+            elif not display:
+                emit_name = 'stdout'
 
-                ball.move(nets, ge , i, self, dt)
+                emitter = StdoutDataEmitter(self.game, name = emit_name)
+            
+            emitter.emit_data(socket= socket, name = emit_name)
 
-                i -= 1
-
-            if (frame_ct % (int(framerate/CHOSEN_FPS))) == 0: #only emit data for CHOSEN_FPS frames per second
-                self.emit_data("screen", socket)
-
-
-
-            if len(self.balls) == 0:
-                self.__init__(self.custom_config, socket)
-
-                return

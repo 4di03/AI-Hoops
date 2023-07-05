@@ -1,46 +1,6 @@
 var imageMap = new Map();
 
 // consider socket.on('connect', function(){});
-
-
-$(document).ready(function(){
-    var protocol = window.location.protocol;
-    var socket = io.connect(protocol+ '//' + document.domain + ':' + location.port);
-    var canvas = document.getElementById("canvas");
-    var ctx = canvas.getContext('2d');
-
-
-    var gameWidth = null;
-    var gameHeight = null;
-    var gameArea = null;
-    socket.on('connect' , function(){
-
-
-    console.log("emmting quit to " + socket.id)
-    //to quit any previous sessions
-    socket.emit("quit", socket.id);
-
-    mode = window.location.href.split('#')[-1]
-
-    socket.emit('start', socket.id);
-
-    var start = new Date();
-
-   
-
-
-    socket.on('dimensions', function(msg){
-        dims = JSON.parse(msg);
-        gameWidth = dims[0];
-        gameHeight = dims[1];
-        gameArea = gameWidth * gameHeight;
-
-        // ctx.fillStyle = "black";
-        // ctx.fillRect(10,10,200,100);
-
-    });
-
-    
 function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , rectColor = null, scaleByArea = false){
     areaFactor = Math.sqrt((canvas.width * canvas.height)/gameArea);
 
@@ -86,6 +46,69 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
     }
     }
+
+function displyStdout(msg){
+    console.log("STDOUT MESSAGE RECIEVED")
+
+        // Create a new element
+    var newElement = document.createElement("div");
+
+    // Set styles for the element
+    newElement.id = "stdout";
+    newElement.style.backgroundColor = "black";
+    newElement.style.position = "fixed";
+    newElement.style.top = "50%";
+    newElement.style.left = "50%";
+    newElement.style.transform = "translate(-50%, -50%)";
+    newElement.style.padding = "20px";
+    newElement.style.color = "white";
+    newElement.textContent = "This is the centered element";
+
+    // Append the new element to the document body
+    document.body.appendChild(newElement);
+    $("#stdout").html(msg);
+    //$("#dialog").dialog("open");
+    }
+
+$(document).ready(function(){
+    var protocol = window.location.protocol;
+    var socket = io.connect(protocol+ '//' + document.domain + ':' + location.port);
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+
+
+    var gameWidth = null;
+    var gameHeight = null;
+    var gameArea = null;
+    socket.on('connect' , function(){
+
+
+    console.log("emmting quit to " + socket.id)
+    //to quit any previous sessions
+    socket.emit("quit", socket.id);
+
+    mode = window.location.href.split('#')[-1]
+
+    socket.emit('start', socket.id);
+
+    var start = new Date();
+
+   
+
+
+    socket.on('dimensions', function(msg){
+        dims = JSON.parse(msg);
+        gameWidth = dims[0];
+        gameHeight = dims[1];
+        gameArea = gameWidth * gameHeight;
+
+        // ctx.fillStyle = "black";
+        // ctx.fillRect(10,10,200,100);
+
+    });
+
+    
+
     var messagesRecieved = 0
 
     // alert(gameWidth, gameHeight);
@@ -210,7 +233,7 @@ function drawScaled(x,y,ctx, width = 0,height = 0, image =null , text =null , re
 
 
     socket.on('screen', updateCanvas);
-
+    socket.on('stdout', displyStdout);
     document.addEventListener('keydown', function(event) {
         if(event.key == "a") {
            socket.emit("input", "left#"+socket.id);
