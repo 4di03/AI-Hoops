@@ -135,8 +135,6 @@ class Game:
 
         self.gen = 0
 
-        print("L138", self.graphics, self.net_type)
-
     def run_frame(self, pyClock, nets, ge, last_time = 0):
         '''
         Moves all balls in game in a single frame
