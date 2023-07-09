@@ -23,7 +23,7 @@ socket = None
 
 game_map = {}
 
-
+GAME_FRAMERATE = 200
 class DataEmitter(ABC):
     '''
     Abstract FunctionObject for emitting json data 
@@ -103,7 +103,7 @@ class Game:
     config_path = "./model/config.txt"
 
 
-    def __init__(self, custom_config, socketio,name = "no name"):
+    def __init__(self, custom_config, socketio,name = "no name", framerate = GAME_FRAMERATE):
         '''
         args:
             framerate: How frequently
@@ -131,9 +131,11 @@ class Game:
         else:
             self.custom_config = None
 
-
+        self.framerate = framerate
 
         self.gen = 0
+
+        print("L138", self.graphics, self.net_type)
 
     def run_frame(self, pyClock, nets, ge, last_time = 0):
         '''
@@ -148,6 +150,8 @@ class Game:
             self.__init__(self.custom_config, socket)
 
             return
+
+        pyClock.tick(TICKS_PER_SEC)
 
         #time since last tick in ticks to base game (250 fps)
         dt = (time.time() - last_time) * TICKS_PER_SEC 
@@ -170,11 +174,10 @@ class GameController:
     '''
     Controller for Game object, runs the game , takes input, and runs NEAT after every frame.
     '''
-    def __init__(self, game, framerate = TICKS_PER_SEC):
+    def __init__(self, game):
 
         self.game = game
 
-        self.framerate = framerate
 
     def replay_local_genome(self):
         self.replay_genome(genome_path='model/local_winner.pkl')
@@ -278,11 +281,14 @@ class GameController:
 
 
         while run:
+            #print(len(self.game.balls))
+            if len(self.game.balls) == 0:
+                print("RAN OUT OF BALLS")
+                return  # end the game if no balls on screen
             last_time = time.time()
             tick_ct += 1
 
             self.game.run_frame(pyClock, nets , ge, last_time = last_time)
-
             socket.on_event('input', make_move)
 
             @socket.on('quit')
@@ -297,16 +303,17 @@ class GameController:
                     game.balls = []
 
 
-            # if tick_ct % 1000 == 0:
-            #     print(tick_ct, int(TICKS_PER_SEC/self.framerate))
-            if display and (tick_ct % (int(TICKS_PER_SEC/self.framerate))) == 0: #only emit data for self.game.framerate frames per second
-                emit_name = 'screen'
+            skip_frames = round(TICKS_PER_SEC/self.game.framerate)
+            #print(tick_ct, skip_frames, display, len(self.game.balls))
+           
+            if (tick_ct % skip_frames) == 0:
+                if display: #only emit data for self.game.framerate frames per second
+                    emit_name = 'screen'
+                    emitter = ScreenDataEmitter(self.game, name = emit_name)
+                elif not display:
+                    emit_name = 'stdout'
+                    emitter = StdoutDataEmitter(self.game, name = emit_name)
 
-                emitter = ScreenDataEmitter(self.game, name = emit_name)
-            elif not display:
-                emit_name = 'stdout'
-
-                emitter = StdoutDataEmitter(self.game, name = emit_name)
             
-            emitter.emit_data(socket= socket)
+                emitter.emit_data(socket= socket)
 

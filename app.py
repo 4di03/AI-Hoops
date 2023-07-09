@@ -48,14 +48,15 @@ socketio = SocketIO(app, async_mode="eventlet", logger=False, engineio_logger=Fa
 # thread = Thread()
 # thread_stop_event = Event()
 
+CONFIG_SECTION_NAME = "UserConfig"
 
 
 #creates config.txt from config object
 def create_config_file(parser, config_data):
     # print(parser.sections())
-    print(config_data)    
+    print(config_data)
     for section in config_data:
-        if section != "undefined":
+        if section != CONFIG_SECTION_NAME:
             for key in config_data[section]:
                 parser[section][key] = config_data[section][key]
 
@@ -63,9 +64,9 @@ def create_config_file(parser, config_data):
     with open("model/config.txt", mode = "w") as cfg:
 
         #rewrite config into local file
-        if config_data["undefined"]["config-file"] != "":
+        if config_data[CONFIG_SECTION_NAME]["config-file"] != "":
             parser = configparser.ConfigParser()
-            parser.read(config_data["undefined"]["config-file"])
+            parser.read(config_data[CONFIG_SECTION_NAME]["config-file"])
 
         parser.write(cfg)
 
@@ -149,9 +150,9 @@ def prompt_mode(sid):
     if sid == request.sid:
         #choose the gamemode for the game
         socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]), to= request.sid)
+        print("L152: ", config_data)
 
-
-        g = Game(config_data["undefined"] if "undefined" in config_data else None, socketio, name = request.sid)
+        g = Game(config_data[CONFIG_SECTION_NAME] if CONFIG_SECTION_NAME in config_data else None, socketio, name = request.sid)
 
         gc = GameController(g)
         games.append(gc)
@@ -172,10 +173,9 @@ def prompt_mode(sid):
 
         start_t = time.time()
         print("L174, STARTING GAME: ")
-        try:
-            mode()
-        except Exception:
-            print("L175, seconds till game end: ", time.time() - start_t)
+        mode()
+        print("L175, seconds till game end: ", time.time() - start_t)
+
 
 
 

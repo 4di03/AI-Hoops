@@ -34,7 +34,7 @@
             <div class = "ranges">
 
             <li>
-                <config-input type="range" min = 1 max = 1000 step = 1 id = "max_gens" > Max Generations</config-input>
+                <config-input type="range" min = 1 max = 1000 step = 1 id = "max_gens" , section = "UserConfig"> Max Generations</config-input>
             </li>
             <li>
                 <config-input type="range" min = 2 max = 100 step = 1 id = "pop_size" section = "NEAT"> Population Size</config-input>
@@ -74,23 +74,30 @@
             </li>
 
             <li>
-                <config-input type="checkbox" id="graphics_choice">Graphics On(slows down training)</config-input>
+                <config-input type="checkbox" id="graphics_choice", section = "UserConfig">Graphics On(slows down training)</config-input>
             </li>
 
             <li>
-                <config-input type="checkbox" id="winner_choice">Override Previous Winner</config-input>
+                <config-input type="checkbox" id="winner_choice", section = "UserConfig">Override Previous Winner</config-input>
             </li>
             </div>
 
-            <div class = "radios">
+            <!-- <div class = "radios">
 
                 <li>
 
-                    <config-input type="radio" id="nn_type">Choose Neural Network:Feed-Forward NN,Recurrent NN</config-input>
+                    <config-input type="radio" id="nn_type", section = "UserConfig">Choose Neural Network:Feed-Forward NN,Recurrent NN</config-input>
 
                 </li>
 
-            </div>
+            </div> -->
+
+            <li>
+                <config-input type="select-dropdown" id="nn_type" section = "UserConfig">Select Neural Network architecture
+                    *Feed-Forward NN,Recurrent NN</config-input>
+               
+
+            </li>
             <li>
 
 
@@ -106,12 +113,12 @@
                 </select>
             </div> -->
 
-        </li>
+            </li>
 
             <li class = "file">
                 
 
-                <config-input type="file" id = "config-file">Or submit your own config text file here : 
+                <config-input type="file" id = "config-file", section = "UserConfig">Or submit your own config text file here : 
                 </config-input>
     
             </li>

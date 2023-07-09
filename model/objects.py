@@ -35,7 +35,7 @@ HOOP_IMG = pygame.transform.scale(
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
-ALLOWED_TIME = 3000 # time in ticks
+ALLOWED_TIME = 2000 # time in ticks
 
 font = pygame.font.SysFont('Comic Sans MS', 10)
 
@@ -244,7 +244,7 @@ class Ball:
                     else:
                         self.y = bbox.y - BALL_SIZE
 
-                        self.y_vel += 0.25 * Y_VEL  #self.damp_vel(self.y_vel, 0.9999)
+                        self.y_vel += 0.55 * Y_VEL  #self.damp_vel(self.y_vel, 0.9999)
 
                         self.x_vel = self.set_vel(self.x_vel, self.x_vel * 0.75)
                     #self.x_vel *= 0.5#self.x_vel = self.damp_vel(self.x_vel, 0.995)

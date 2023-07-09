@@ -1,4 +1,5 @@
 // import {Solo, Train, Winner} from "./modes.js";
+const CONFIG_SECTION_NAME = "UserConfig";
 
 function loadGame(){
 
@@ -56,19 +57,28 @@ $(document).ready(function(){
 
         var config ={};
         for(var i = 0 ; i < elements.length ; i++){
+
             var element = elements[i];
 
             if (element.type == "radio" &&!element.checked){
                     continue;
             }
+
+
             let section = $(`config-input#${element.id}`).attr('section')
+            
+            console.log($(`config-input#${element.id}`))
+
+            if (element.type == "radio"){
+            console.log(section)
+            }
             config[section] =  config[section] || {};
             config[section][element.id] = element.value;
 
             //keeps only code customization seettings if config file is already given.
             if (element.id == "config-file" && element.value != ""){
                 for(const[key,value] of Object.entries(config)){
-                    if(key != "undefined"){
+                    if(key != CONFIG_SECTION_NAME){
                         delete config['key'];
                     }
 
@@ -82,7 +92,10 @@ $(document).ready(function(){
 
         console.log(config)
         
-
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+    
+        sleep(10000);
+        
         socket.emit("train_config", JSON.stringify(config));
 
         socket.on("confirm_config", function(msg){
