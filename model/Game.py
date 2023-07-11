@@ -15,8 +15,10 @@ import json
 import sys 
 import random
 import time
+from flask_socketio import SocketIO
 from flask import request, copy_current_request_context
 from abc import ABC, abstractmethod
+from ReportingPopulation import ReportingPopulation
 # from application import config_data, create_config_file
 #
 # import pydevd_pycharm
@@ -27,66 +29,6 @@ socket = None
 game_map = {}
 
 GAME_FRAMERATE = 200
-class DataEmitter(ABC):
-    '''
-    Abstract FunctionObject for emitting json data 
-    of a certain type from server to client.
-    '''
-
-    def __init__(self,game, name):
-        '''
-        args:
-            game: an instance of Game
-            name: name of even to emit to client
-        '''
-        self.game = game
-        self.name = name
-
-    @abstractmethod
-    def get_data(self):
-        '''
-        returns json data to emit to client
-        args:  
-            game: an instance of Game
-        '''
-        raise NotImplementedError
-
-    def emit_data(self,socket):
-        '''
-        emits data to client.
-        args:
-            name: name of event to emit to client
-            socket: SocketIO object
-            game: Game object
-        '''
-        socket.emit(self.name,self.get_data(), to = request.sid)
-        socket.sleep(0)
-
-
-class ScreenDataEmitter(DataEmitter):
-
-
-    def get_data(self):
-        '''
-        Gets jsonified screen data to emit to client
-        '''
-        balls_data = []
-        for ball in self.game.balls:
-            balls_data.append(ball.get_data())
-
-        return json.dumps(balls_data)
-
-
-class StdoutDataEmitter(DataEmitter):
-
-    def get_data(self):
-        '''
-        Get data from server stdout as string into json format
-        '''
-
-
-
-        return json.dumps(sys.stdout.getvalue())
 
 CHOSEN_FPS = TICKS_PER_SEC
 
@@ -108,7 +50,7 @@ class Game:
     config_path = "./model/config.txt"
 
 
-    def __init__(self, custom_config, socketio,name = "no name", framerate = GAME_FRAMERATE):
+    def __init__(self, custom_config, socketio : SocketIO,name = "no name", framerate = GAME_FRAMERATE):
         '''
         args:
             framerate: How frequently
@@ -221,8 +163,7 @@ class GameController:
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, self.game.config_path)
         
-
-        p = neat.Population(config)
+        p = neat.Population(config) if self.game.graphics else ReportingPopulation(config, socket)
 
 
         p.add_reporter(neat.StdOutReporter(True))
@@ -272,6 +213,7 @@ class GameController:
         global game_map
         nets = [] # list of neural networks
         ge = [] # list of genomes
+        display = self.game.graphics
 
         for genome_id , g in genomes:
             net = self.game.net_type.create(g, config)
@@ -313,16 +255,9 @@ class GameController:
 
             skip_frames = round(TICKS_PER_SEC/self.game.framerate)
             #print(tick_ct, skip_frames, display, len(self.game.balls))
-           
-            if (tick_ct % skip_frames) == 0:
-                display = self.game.graphics
-                if display is True: #only emit data for self.game.framerate frames per second
-                    emit_name = 'screen'
-                    emitter = ScreenDataEmitter(self.game, name = emit_name)
-                else:
-                    emit_name = 'stdout'
-                    emitter = StdoutDataEmitter(self.game, name = emit_name)
 
-            
+            if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second
+                emit_name = 'screen'
+                emitter = ScreenDataEmitter(self.game, name = emit_name)
                 emitter.emit_data(socket= socket)
 
