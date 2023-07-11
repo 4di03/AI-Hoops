@@ -28,8 +28,40 @@ class ConfigInput extends HTMLElement{
     
   }
 
+    getValue(){
+
+        let t = this.type;
+        console.log("CALLING getValue");
+
+        let innerInput = null;
+        switch(t){
+
+            case "select-dropdown":
+                innerInput = this.getElementsByTagName("select")[0]
+                break;
+            default:
+                innerInput = this.getElementsByTagName("input")[0]
+
+            //console.log(ret)
+        }
+
+        switch (innerInput.type){
+
+            case "checkbox":
+                return String(innerInput.checked);
+                break;
+            default:
+                return innerInput.value;
+        }
+
+    }
     
     connectedCallback(){
+        // called when compoennt is inserted into DOM
+
+        // Better to  use subclasses instead of switch statement on this.type
+
+
 
 
         var mid = (parseInt(this.max) - parseInt(this.min))/2 + parseInt(this.min);
@@ -46,7 +78,7 @@ class ConfigInput extends HTMLElement{
 
         } else if (this.type =="checkbox"){
             this.innerHTML = `${this.text} <div class = "${this.type}" id ="${this.id}">
-            <input  id = ${this.id} type = "${this.type}"  checked/>
+            <input  id = ${this.id} type = "${this.type}" />
             </div>`;
 
 

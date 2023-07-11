@@ -51,14 +51,14 @@ $(document).ready(function(){
 
         //get form data
 
-        var elements = [].slice.call(document.getElementsByTagName("input"));
+        var elements = [].slice.call(document.getElementsByTagName("config-input"));
 
         elements = elements.concat([].slice.call(document.getElementsByTagName("select")))
 
         var config ={};
         for(var i = 0 ; i < elements.length ; i++){
 
-            var element = elements[i];
+            let element = elements[i];
 
             if (element.type == "radio" &&!element.checked){
                     continue;
@@ -69,11 +69,14 @@ $(document).ready(function(){
             
             console.log($(`config-input#${element.id}`))
 
-            if (element.type == "radio"){
-            console.log(section)
-            }
+            // if (element.type == "radio"){
+            // console.log(section)
+            // }
             config[section] =  config[section] || {};
-            config[section][element.id] = element.value;
+
+            let elemval = element.getValue();
+            console.log(elemval)
+            config[section][element.id] = elemval
 
             //keeps only code customization seettings if config file is already given.
             if (element.id == "config-file" && element.value != ""){
@@ -90,12 +93,14 @@ $(document).ready(function(){
  
         }
 
-        console.log(config)
+        //console.log(config)
         
         const sleep = ms => new Promise(r => setTimeout(r, ms));
     
         sleep(10000);
-        
+
+        //throw new Error(JSON.stringify(config));
+
         socket.emit("train_config", JSON.stringify(config));
 
         socket.on("confirm_config", function(msg){

@@ -64,7 +64,7 @@ def create_config_file(parser, config_data):
     with open("model/config.txt", mode = "w") as cfg:
 
         #rewrite config into local file
-        if config_data[CONFIG_SECTION_NAME]["config-file"] != "":
+        if "config-file" in config_data and config_data[CONFIG_SECTION_NAME]["config-file"] != "": #TODO  convert config file to config-input
             parser = configparser.ConfigParser()
             parser.read(config_data[CONFIG_SECTION_NAME]["config-file"])
 
@@ -172,7 +172,6 @@ def prompt_mode(sid):
 
 
         start_t = time.time()
-        print("L174, STARTING GAME: ")
         mode()
         print("L175, seconds till game end: ", time.time() - start_t)
 

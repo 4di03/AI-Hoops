@@ -18,6 +18,9 @@ import time
 from flask import request, copy_current_request_context
 from abc import ABC, abstractmethod
 # from application import config_data, create_config_file
+#
+# import pydevd_pycharm
+# pydevd_pycharm.settrace('localhost', port=0, stdoutToServer=True, stderrToServer=True)
 
 socket = None
 
@@ -81,6 +84,8 @@ class StdoutDataEmitter(DataEmitter):
         Get data from server stdout as string into json format
         '''
 
+
+
         return json.dumps(sys.stdout.getvalue())
 
 CHOSEN_FPS = TICKS_PER_SEC
@@ -107,6 +112,7 @@ class Game:
         '''
         args:
             framerate: How frequently
+            TODO: move custom_config to controller, model should not know if visuals are sent to the view
         '''
         global socket
         self.name = name
@@ -118,6 +124,9 @@ class Game:
         self.net_type = neat.nn.FeedForwardNetwork
         socket = socketio
         self.solo = False
+        self.max_gens = None
+        self.graphics = True
+        self.override_winner = False
         if custom_config:
             self.max_gens = int(custom_config["max_gens"])
             if "Feed-Forward NN" in custom_config:
@@ -125,8 +134,9 @@ class Game:
             else: 
                 self.net_type = neat.nn.RecurrentNetwork
 
-            self.graphics = custom_config["graphics_choice"] == "on"
-            self.override_winner = custom_config["winner_choice"] == "on"
+            self.graphics = custom_config["graphics_choice"]
+            self.override_winner = custom_config["winner_choice"]
+
             self.custom_config = custom_config
         else:
             self.custom_config = None
@@ -204,10 +214,9 @@ class GameController:
         self.train_AI(True)
 
     def show_main(self, genomes, config):
-        self.main(genomes,config,display= True)
-
-
-    def train_AI(self, display = False):
+        raise Exception("GRAPHICS MODE")
+        self.main(genomes,config)
+    def train_AI(self):
         self.game.config_path = "./model/config.txt"
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, self.game.config_path)
@@ -223,7 +232,8 @@ class GameController:
         # def fast_main(genomes, config):
         #     self.main(genomes,config, framerate = CHOSEN_FPS)
 
-        winner = p.run(self.main, self.game.max_gens)
+        mfunc = self.main if self.game.graphics else self.main_no_graphics # decides whether to show graphics or not
+        winner = p.run(mfunc, self.game.max_gens)
 
 
         if self.game.override_winner and not self.game.kill:
@@ -253,7 +263,7 @@ class GameController:
         self.main([],None)
 
 
-    def main(self, genomes, config,  display = True):
+    def main(self, genomes, config):
         '''
         main method for the game, runs the game loop and emits screen data to client
         args:
@@ -305,10 +315,11 @@ class GameController:
             #print(tick_ct, skip_frames, display, len(self.game.balls))
            
             if (tick_ct % skip_frames) == 0:
-                if display: #only emit data for self.game.framerate frames per second
+                display = self.game.graphics
+                if display is True: #only emit data for self.game.framerate frames per second
                     emit_name = 'screen'
                     emitter = ScreenDataEmitter(self.game, name = emit_name)
-                elif not display:
+                else:
                     emit_name = 'stdout'
                     emitter = StdoutDataEmitter(self.game, name = emit_name)
 

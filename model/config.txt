@@ -2,7 +2,7 @@
 fitness_criterion = max
 fitness_threshold = 25050
 pop_size = 51
-reset_on_extinction = on
+reset_on_extinction = false
 
 [DefaultGenome]
 activation_default = relu
@@ -25,10 +25,10 @@ conn_delete_prob = 0.5
 enabled_default = True
 enabled_mutate_rate = 0.1
 feed_forward = True
-initial_connection = full
+initial_connection = full_direct
 node_add_prob = 0.4
 node_delete_prob = 0.4
-num_hidden = 15
+num_hidden = 5
 num_inputs = 6
 num_outputs = 3
 response_init_mean = 1.0
