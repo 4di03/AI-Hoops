@@ -18,7 +18,10 @@ import time
 from flask_socketio import SocketIO
 from flask import request, copy_current_request_context
 from abc import ABC, abstractmethod
+sys.path.append('./model')
 from ReportingPopulation import ReportingPopulation
+sys.path.append('./util')
+from util import ScreenDataEmitter
 # from application import config_data, create_config_file
 #
 # import pydevd_pycharm
@@ -76,7 +79,7 @@ class Game:
             else: 
                 self.net_type = neat.nn.RecurrentNetwork
 
-            self.graphics = custom_config["graphics_choice"]
+            self.graphics = custom_config["graphics_choice"] == "true"
             self.override_winner = custom_config["winner_choice"]
 
             self.custom_config = custom_config
@@ -163,7 +166,7 @@ class GameController:
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, self.game.config_path)
         
-        p = neat.Population(config) if self.game.graphics else ReportingPopulation(config, socket)
+        p = neat.Population(config) if self.game.graphics else ReportingPopulation(config, socket) # emit data to client if graphics is true, else emit stdout
 
 
         p.add_reporter(neat.StdOutReporter(True))
@@ -173,7 +176,7 @@ class GameController:
         # def fast_main(genomes, config):
         #     self.main(genomes,config, framerate = CHOSEN_FPS)
 
-        mfunc = self.main if self.game.graphics else self.main_no_graphics # decides whether to show graphics or not
+        mfunc = self.main # decides whether to show graphics or not
         winner = p.run(mfunc, self.game.max_gens)
 
 
@@ -228,9 +231,8 @@ class GameController:
         self.game.name = request.sid
         game_map[request.sid] = self.game
         tick_ct = 0
-
-
-        while run:
+        print("L234")
+        while run:  
             #print(len(self.game.balls))
             if len(self.game.balls) == 0:
                 print("RAN OUT OF BALLS")

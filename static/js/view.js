@@ -1,6 +1,11 @@
+import { initGame } from './util.js';
+
+
 var imageMap = new Map();
 
 // consider socket.on('connect', function(){});
+
+
 
 $(document).ready(function () {
 
@@ -15,14 +20,8 @@ $(document).ready(function () {
     var gameArea = null;
     socket.on('connect', function () {
 
-
-        console.log("emmting quit to " + socket.id)
-        //to quit any previous sessions
-        socket.emit("quit", socket.id);
-
-        mode = window.location.href.split('#')[-1]
-
-        socket.emit('start', socket.id);
+        initGame(socket);
+        
 
         var start = new Date();
 
@@ -76,22 +75,7 @@ $(document).ready(function () {
         function displayStdout(msg) {
             console.log("STDOUT MESSAGE RECIEVED")
 
-            // Create a new element
-            var newElement = document.createElement("div");
 
-            // Set styles for the element
-            newElement.id = "stdout";
-            newElement.style.backgroundColor = "black";
-            newElement.style.position = "fixed";
-            newElement.style.top = "50%";
-            newElement.style.left = "50%";
-            newElement.style.transform = "translate(-50%, -50%)";
-            newElement.style.padding = "20px";
-            newElement.style.color = "white";
-            newElement.textContent = "This is the centered element";
-
-            // Append the new element to the document body
-            document.body.appendChild(newElement);
             $("#stdout").html(msg);
             //$("#dialog").dialog("open");
         }
@@ -140,29 +124,7 @@ $(document).ready(function () {
             }
         }
 
-        function displayStdout(msg) {
-            console.log("STDOUT MESSAGE RECIEVED")
-
-            // Create a new element
-            var newElement = document.createElement("div");
-
-            // Set styles for the element
-            newElement.id = "stdout";
-            newElement.style.backgroundColor = "black";
-            newElement.style.position = "fixed";
-            newElement.style.top = "50%";
-            newElement.style.left = "50%";
-            newElement.style.transform = "translate(-50%, -50%)";
-            newElement.style.padding = "20px";
-            newElement.style.color = "white";
-            newElement.textContent = "This is the centered element";
-
-            // Append the new element to the document body
-            document.body.appendChild(newElement);
-            $("#stdout").html(msg);
-            //$("#dialog").dialog("open");
-        }
-
+ 
         function drawQuitButton(rect) {
 
 
@@ -305,7 +267,6 @@ $(document).ready(function () {
 
             console.log(gameArea, " GAME AREA VALUE")
             socket.on('screen', updateCanvas);
-            socket.on('stdout', displayStdout);
             document.addEventListener('keydown', function (event) {
                 if (event.key == "a") {
                     socket.emit("input", "left#" + socket.id);

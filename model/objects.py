@@ -156,7 +156,6 @@ class Ball:
                 nets.pop(i) # remove net from game
                 ge.pop(i) # remove genome from game
 
-            print("GAME OVER")
             return
 
 

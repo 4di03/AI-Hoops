@@ -63,7 +63,7 @@ class ReportingPopulation(Population):
                     fv = self.fitness_criterion(g.fitness for g in self.population.values())
                     if fv >= self.config.fitness_threshold:
                         self.reporters.found_solution(self.config, self.generation, best)
-                        break
+                        return None
 
                 # Create the next generation from the current generation.
                 self.population = self.reproduction.reproduce(self.config, self.species,
@@ -95,7 +95,12 @@ class ReportingPopulation(Population):
             with redirect_stdout(f):
                 k = run_loop(k)
 
-            socket.emit("stdout", f.getvalue()) # give screen data to client
+                if k% 10 == 0:
+                    socket.emit("stdout", f.getvalue()) # give screen data to client
+
+                if k is None:
+                    break
+
         if self.config.no_fitness_termination:
             self.reporters.found_solution(self.config, self.generation, self.best_genome)
 

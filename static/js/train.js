@@ -16,6 +16,24 @@ function loadGame(){
 
 }
 
+function openTextMode(mode, socket){
+    socket.emit("recieve_mode", mode)
+    loadGame()
+
+
+    //waiting for confirmation that mode was recieved
+    socket.on("got game", function(msg) {
+
+        setTimeout(
+            function(){
+                window.location.replace('../text_view');
+            }, 1000
+
+        );
+
+    });
+}
+
 function openCanvas(mode, socket){
     socket.emit("recieve_mode", mode)
     loadGame()
@@ -82,7 +100,7 @@ $(document).ready(function(){
             if (element.id == "config-file" && element.value != ""){
                 for(const[key,value] of Object.entries(config)){
                     if(key != CONFIG_SECTION_NAME){
-                        delete config['key'];
+                        delete config[key];
                     }
 
 
@@ -102,9 +120,16 @@ $(document).ready(function(){
         //throw new Error(JSON.stringify(config));
 
         socket.emit("train_config", JSON.stringify(config));
+        let gc = "graphics_choice"
+        let graphics_mode = config[CONFIG_SECTION_NAME][gc];
 
         socket.on("confirm_config", function(msg){
-            openCanvas('train', socket);
+            
+            if (graphics_mode == "true"){
+                openCanvas('train', socket);
+            } else{
+                openTextMode('train', socket)
+            }
         });
     });
 
