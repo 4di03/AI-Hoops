@@ -15,7 +15,7 @@ from flask_cors import CORS
 import logging
 import time
 
-SHOW_FLASK_LOGS = False
+SHOW_FLASK_LOGS = True
 
 if not SHOW_FLASK_LOGS:
     log = logging.getLogger('werkzeug')
@@ -42,7 +42,9 @@ cfg_parser.read("model/default_config.txt")
 
 
 #turn the flask app into a socketio app
-socketio = SocketIO(app, async_mode="eventlet", logger=False, engineio_logger=False,cors_allowed_origins="*")
+socketio = SocketIO(app, async_mode="eventlet", logger=SHOW_FLASK_LOGS, 
+                    engineio_logger=SHOW_FLASK_LOGS,cors_allowed_origins="*",
+                 pingInterval = 10000, pingTimeout = 600000 * 5)
 
 # #random number Generator Thread
 # thread = Thread()
@@ -54,7 +56,6 @@ CONFIG_SECTION_NAME = "UserConfig"
 #creates config.txt from config object
 def create_config_file(parser, config_data):
     # print(parser.sections())
-    print(config_data)
     for section in config_data:
         if section != CONFIG_SECTION_NAME:
             for key in config_data[section]:
@@ -104,7 +105,7 @@ def game():
 @app.route('/text_view/')
 def text_game():
     #only by sending this page first will the client be connected to the socketio instance
-    return render_template('text_view.html')
+    return render_template('text_view.html') # trying canvas
 
 @app.route('/train/')
 def train_menu():
@@ -150,15 +151,19 @@ def recieve_mode(mode):
 
 @socketio.on('start')
 def prompt_mode(sid):
+    '''
+    args:
+        sid: socket/session id of client
+    '''
     global games
     # print(f'starting for {sid} with current request.id: {request.sid}')
-    if sid == request.sid:
+    if sid == request.sid: # check if the current request is the same as the one that sent the start message
         #choose the gamemode for the game
         socketio.emit('dimensions', json.dumps([WIN_WIDTH, WIN_HEIGHT]), to= request.sid)
-        print("L152: ", config_data)
 
         g = Game(config_data[CONFIG_SECTION_NAME] if CONFIG_SECTION_NAME in config_data else None, socketio, name = request.sid)
 
+        #g.graphics = True # test game.graphics after this point is the culprit
         gc = GameController(g)
         games.append(gc)
 

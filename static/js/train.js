@@ -17,6 +17,7 @@ function loadGame(){
 }
 
 function openTextMode(mode, socket){
+    console.log("OPENING TEXT MODE")
     socket.emit("recieve_mode", mode)
     loadGame()
 
@@ -26,7 +27,7 @@ function openTextMode(mode, socket){
 
         setTimeout(
             function(){
-                window.location.replace('../text_view');
+                window.location.replace('../text_view'); // trying game
             }, 1000
 
         );
@@ -35,6 +36,7 @@ function openTextMode(mode, socket){
 }
 
 function openCanvas(mode, socket){
+    console.log("OPENING CANVAS")
     socket.emit("recieve_mode", mode)
     loadGame()
 
@@ -71,7 +73,7 @@ $(document).ready(function(){
 
         var elements = [].slice.call(document.getElementsByTagName("config-input"));
 
-        elements = elements.concat([].slice.call(document.getElementsByTagName("select")))
+        //elements = elements.concat([].slice.call(document.getElementsByTagName("select")))
 
         var config ={};
         for(var i = 0 ; i < elements.length ; i++){
@@ -85,51 +87,57 @@ $(document).ready(function(){
 
             let section = $(`config-input#${element.id}`).attr('section')
             
-            console.log($(`config-input#${element.id}`))
+            //console.log($(`config-input#${element.id}`))
 
             // if (element.type == "radio"){
             // console.log(section)
             // }
             config[section] =  config[section] || {};
-
+            
+            //console.log(element)
             let elemval = element.getValue();
-            console.log(elemval)
             config[section][element.id] = elemval
 
             //keeps only code customization seettings if config file is already given.
-            if (element.id == "config-file" && element.value != ""){
+            console.log("L100", element.id, elemval)
+            if (element.id == "config-file" && elemval != ""){
+                //console.log("GOING iN")
                 for(const[key,value] of Object.entries(config)){
                     if(key != CONFIG_SECTION_NAME){
                         delete config[key];
                     }
-
-
                 }
-
                 break;
             }
  
         }
 
-        //console.log(config)
+        //throw new Error("L110", config)
+
         
         const sleep = ms => new Promise(r => setTimeout(r, ms));
     
         sleep(10000);
+        let gc = "graphics_choice"
 
-        //throw new Error(JSON.stringify(config));
+       //ß config[CONFIG_SECTION_NAME][gc] = 'true'; // trying this, THIS WORKS, MEANING IT IS AN ISSUE WITH PYTHON????
 
         socket.emit("train_config", JSON.stringify(config));
-        let gc = "graphics_choice"
-        let graphics_mode = config[CONFIG_SECTION_NAME][gc];
 
+        //config[CONFIG_SECTION_NAME][gc] = 'true';
+        let graphics_mode = config[CONFIG_SECTION_NAME][gc];
+        //graphics_mode = 'true';
         socket.on("confirm_config", function(msg){
-            
-            if (graphics_mode == "true"){
-                openCanvas('train', socket);
-            } else{
-                openTextMode('train', socket)
-            }
+        if (graphics_mode == "true"){
+            console.log(socket)
+            openCanvas('train', socket);
+        } else{
+            console.log(socket)
+            //openCanvas('train', socket);// trying this
+            openTextMode('train', socket); 
+
+            //openTextMode('train', socket)
+        }
         });
     });
 

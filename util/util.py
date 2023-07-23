@@ -54,17 +54,22 @@ class ScreenDataEmitter(DataEmitter):
         return json.dumps(balls_data)
 
 
-# class StringDataEmitter(DataEmitter):
-#
-#
-#     def __init__(self, name , text):
-#         super().__init__(name)
-#         self.text = text
-#     def get_data(self):
-#         '''
-#         Get data from server stdout as string into json format
-#         '''
-#
-#         return text
+class StringDataEmitter(DataEmitter):
+
+
+    def __init__(self, name , text = None):
+        super().__init__(name)
+        self.text = text
+
+    def update_text(self, text):
+        self.text = text
+
+
+    def get_data(self):
+        '''
+        Get data from server stdout as string into json format
+        '''
+
+        return self.text
 
 

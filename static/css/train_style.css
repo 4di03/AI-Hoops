@@ -2,6 +2,48 @@
     font-family: "1982";
     src: URL("../fonts/BACKTO1982.TTF") format("truetype");
   }
+
+
+  .center-container {
+    display: flex;
+    justify-content: center; /* Horizontal centering */
+    align-items: center; /* Vertical centering */
+  }
+
+  #stdout {
+    background-color: #1e1e1e;
+    border: 1px solid #383838;
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    max-width: 800px;
+    margin: 50px auto;
+    overflow: hidden;
+    padding: 10px;
+    white-space: pre-wrap;
+
+    color: #4caf50; /* Terminal prompt color */
+    font-family: 'Courier New', monospace; /* Terminal prompt font */
+  }
+  
+  #stdout::before {
+    content: 'NEAT Console Output';
+    color: #4caf50;
+  }
+  
+  #stdout::after {
+    content: '\A';
+    white-space: pre;
+  }
+
+#HomeButton{
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, -50%);
+  margin: 0 auto;
+
+}
+
   .title {
     color:orange;
     -webkit-animation: bounceInLeft;

@@ -37,15 +37,18 @@ CHOSEN_FPS = TICKS_PER_SEC
 
 #only for solo mode
 def make_move(input):
-    input,sid= input.split("#")
+
+
+    msg,sid= input.split("#")
     game = game_map[sid]
+
 
     # print(f'trying to move, SID: {sid}, request.id: {request.sid}, game: {game}, true game socketid: {game.name}')
     if sid == request.sid and sid == game.name and game.solo:
-        if input == "right" and len(game.balls) > 0:
+        if msg == "right" and len(game.balls) > 0:
             game.balls[0].jump(True)
 
-        elif input == "left" and len(game.balls) > 0:
+        elif msg == "left" and len(game.balls) > 0:
             game.balls[0].jump(False)
 
 
@@ -163,10 +166,15 @@ class GameController:
         self.main(genomes,config)
     def train_AI(self):
         self.game.config_path = "./model/config.txt"
+        graphics = False#self.game.graphics TRYING THISs
+
+        #self.game.graphics = True # only THIS DOES
+
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, self.game.config_path)
         
-        p = neat.Population(config) if self.game.graphics else ReportingPopulation(config, socket) # emit data to client if graphics is true, else emit stdout
+        #p = neat.Population(config) if self.game.graphics else ReportingPopulation(config, socket) # emit data to client if graphics is true, else emit stdout
+        p = ReportingPopulation(config, socket, graphics) # emit data to client if graphics is true, else emit stdout, NOT CULPRIT
 
 
         p.add_reporter(neat.StdOutReporter(True))
@@ -218,6 +226,7 @@ class GameController:
         ge = [] # list of genomes
         display = self.game.graphics
 
+
         for genome_id , g in genomes:
             net = self.game.net_type.create(g, config)
             nets.append(net)
@@ -231,35 +240,42 @@ class GameController:
         self.game.name = request.sid
         game_map[request.sid] = self.game
         tick_ct = 0
-        print("L234")
+
+        emit_name = 'screen' #if not display else 'screen'
+
+
+        emitter = ScreenDataEmitter(self.game, name = emit_name)
         while run:  
             #print(len(self.game.balls))
             if len(self.game.balls) == 0:
-                print("RAN OUT OF BALLS")
                 return  # end the game if no balls on screen
             last_time = time.time()
             tick_ct += 1
 
             self.game.run_frame(pyClock, nets , ge, last_time = last_time)
-            socket.on_event('input', make_move)
+            socket.on_event('input', make_move) # non-decorator version of socket.on
 
             @socket.on('quit')
             def quit_game(sid):
                 # print(f'trying to quit, SID: {sid}, request.id: {request.sid}, game: {self}, true game socketid: {self.name}')
-                game = game_map[sid]
-                if sid == request.sid and sid == game.name:
-                    # print("Quitting for " + sid +", " + str(self))
-                    if ge:
-                        ge[0].fitness = sys.maxsize
-                        game.kill = True
-                    game.balls = []
+
+                if sid in game_map:
+                    game = game_map[sid]
+                    if sid == request.sid and sid == game.name:
+                        # print("Quitting for " + sid +", " + str(self))
+                        if ge:
+                            ge[0].fitness = sys.maxsize
+                            game.kill = True
+                        game.balls = []
 
 
             skip_frames = round(TICKS_PER_SEC/self.game.framerate)
-            #print(tick_ct, skip_frames, display, len(self.game.balls))
 
-            if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second
-                emit_name = 'screen'
-                emitter = ScreenDataEmitter(self.game, name = emit_name)
+            if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second TRYNG THIS
+
                 emitter.emit_data(socket= socket)
+            
+                # socket.emit(emit_name, self.game.graphics, to = request.sid)
+                # socket.sleep(0)
+
 

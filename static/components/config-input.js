@@ -31,7 +31,6 @@ class ConfigInput extends HTMLElement{
     getValue(){
 
         let t = this.type;
-        console.log("CALLING getValue");
 
         let innerInput = null;
         switch(t){

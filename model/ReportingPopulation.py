@@ -4,11 +4,18 @@ from contextlib import redirect_stdout
 class CompleteExtinctionException(Exception):
     pass
 from flask_socketio import SocketIO
-class ReportingPopulation(Population):
+from flask import request
+import sys
+sys.path.append('./util')
+from util import StringDataEmitter         
 
-    def __init__(self, config, socket : SocketIO):
+EVENT_NAME = "stdout"
+
+class ReportingPopulation(Population):
+    def __init__(self, config, socket : SocketIO, graphics = True):
         super().__init__(config)
         self.socket = socket
+        self.graphics = graphics
     def run(self, fitness_function,n=None):
         """
         Runs NEAT's genetic algorithm for at most n generations.  If n
@@ -33,8 +40,10 @@ class ReportingPopulation(Population):
             raise RuntimeError("Cannot have no generational limit with no fitness termination")
 
         k = 0
-        while n is None or k < n:
 
+        emitter = StringDataEmitter(EVENT_NAME)
+        while n is None or k < n:
+            socket.sleep(0)# per https://stackoverflow.com/questions/55503874/flask-socketio-eventlet-error-client-is-gone-closing-socket
 
             def run_loop(k):
                 k += 1
@@ -92,14 +101,28 @@ class ReportingPopulation(Population):
 
             f = io.StringIO()
 
-            with redirect_stdout(f):
+   
+            if not self.graphics:
+                with redirect_stdout(f):
+                    k = run_loop(k)
+
+                    
+                    if k is None:
+                        break
+                    
+                print(f"Generation {k} finished, EMTTING TO STDOUT")
+
+                emitter.update_text(f.getvalue())
+                emitter.emit_data(socket)# give screen data to client
+
+            else:
                 k = run_loop(k)
-
-                if k% 10 == 0:
-                    socket.emit("stdout", f.getvalue()) # give screen data to client
-
                 if k is None:
-                    break
+                        break
+                
+            
+
+            #print(f.getvalue(), len(f.getvalue()))
 
         if self.config.no_fitness_termination:
             self.reporters.found_solution(self.config, self.generation, self.best_genome)

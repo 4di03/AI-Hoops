@@ -9,3 +9,16 @@ export function initGame(socket){
 
     
 }
+
+function returnToMenu(socket) {
+    console.log("returning to menu")
+
+    socket.emit('quit', socket.id)
+
+
+    setTimeout(window.location.replace("/"));
+}
+
+window.returnToMenu = returnToMenu;
+
+window.initGame = initGame;

@@ -1,10 +1,8 @@
-import { initGame } from './util.js';
-
+//import { initGame } from './util.js';
 
 var imageMap = new Map();
 
 // consider socket.on('connect', function(){});
-
 
 
 $(document).ready(function () {
@@ -20,7 +18,7 @@ $(document).ready(function () {
     var gameArea = null;
     socket.on('connect', function () {
 
-        initGame(socket);
+        window.initGame(socket);
         
 
         var start = new Date();
@@ -141,20 +139,20 @@ $(document).ready(function () {
             messagesRecieved += 1
             let secondsElapsed = (new Date() - start) / 1000;
 
-            console.log("Average messages per seconds: " + (messagesRecieved / secondsElapsed).toString())
+            //console.log("Average messages per seconds: " + (messagesRecieved / secondsElapsed).toString())
 
             ctx.canvas.width = window.innerWidth;
             ctx.canvas.height = window.innerHeight;
             // console.log(objects)
-
+ 
             objects = JSON.parse(objects);
-            for (i = 0; i < objects.length; i += 1) {
+            for (let i = 0; i < objects.length; i += 1) {
                 object = objects[i];
 
                 images = object["images"]
 
                 for (j = 0; j < images.length; j++) {
-                    image = images[j];
+                    let image = images[j];
                     // console.log(image)
                     let width = image[3];
                     let height = image[4];
@@ -243,14 +241,7 @@ $(document).ready(function () {
             };
         }
 
-        function returnToMenu() {
-            console.log("returning to menu")
 
-            socket.emit('quit', socket.id)
-
-
-            setTimeout(window.location.replace("/"));
-        }
 
         //Function to check whether a point is inside a rectangle
         function isInside(pos, rect) {
@@ -267,6 +258,13 @@ $(document).ready(function () {
 
             console.log(gameArea, " GAME AREA VALUE")
             socket.on('screen', updateCanvas);
+
+
+            socket.on('stdout', function (msg) {
+
+                console.log("recieving at view.js", msg);
+            });
+
             document.addEventListener('keydown', function (event) {
                 if (event.key == "a") {
                     socket.emit("input", "left#" + socket.id);
@@ -274,7 +272,7 @@ $(document).ready(function () {
                     socket.emit("input", "right#" + socket.id);
                 } else if (event.key == "m") {
 
-                    returnToMenu()
+                    window.returnToMenu(socket)
                 }
             });
 
@@ -291,13 +289,14 @@ $(document).ready(function () {
                     height: 50
                 };
                 if (isInside(mousePos, rect)) {
-                    returnToMenu()
+                    window.returnToMenu(socket)
                 }
             }, false);
 
         }
-
+        
         socket.on('dimensions', function (msg) {
+            console.log(msg)
             dims = JSON.parse(msg);
             gameWidth = dims[0];
             gameHeight = dims[1];
