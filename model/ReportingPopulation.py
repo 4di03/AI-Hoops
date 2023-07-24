@@ -43,7 +43,6 @@ class ReportingPopulation(Population):
 
         emitter = StringDataEmitter(EVENT_NAME)
         while n is None or k < n:
-            socket.sleep(0)# per https://stackoverflow.com/questions/55503874/flask-socketio-eventlet-error-client-is-gone-closing-socket
 
             def run_loop(k):
                 k += 1

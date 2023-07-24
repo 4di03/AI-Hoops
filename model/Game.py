@@ -271,11 +271,16 @@ class GameController:
 
             skip_frames = round(TICKS_PER_SEC/self.game.framerate)
 
+
+
             if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second TRYNG THIS
 
                 emitter.emit_data(socket= socket)
             
                 # socket.emit(emit_name, self.game.graphics, to = request.sid)
                 # socket.sleep(0)
+
+            socket.sleep(0)# per https://stackoverflow.com/questions/55503874/flask-socketio-eventlet-error-client-is-gone-closing-socket
+
 
 
