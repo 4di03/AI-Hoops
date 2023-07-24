@@ -83,7 +83,7 @@ class Game:
                 self.net_type = neat.nn.RecurrentNetwork
 
             self.graphics = custom_config["graphics_choice"] == "true"
-            self.override_winner = custom_config["winner_choice"]
+            self.override_winner = custom_config["winner_choice"] == "true"
 
             self.custom_config = custom_config
         else:
@@ -153,7 +153,7 @@ class GameController:
         genomes = [(1, genome)]
 
         # Call game with only the loaded genome
-        self.main(genomes, config, framerate,socket)
+        self.main(genomes, config)
 
 
     
@@ -197,7 +197,7 @@ class GameController:
             cur_highscore = int(open("model/highscore.txt", mode="rt").read())
             if winner.fitness > cur_highscore:
                 with open("model/highscore.txt", mode = "w") as h:
-                    h.write(winner.fitness)
+                    h.write(str(winner.fitness))
                 
                 print("overriding record winner")
 

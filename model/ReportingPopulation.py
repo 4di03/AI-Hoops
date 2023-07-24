@@ -106,13 +106,14 @@ class ReportingPopulation(Population):
                     k = run_loop(k)
 
                     
-                    if k is None:
-                        break
                     
                 print(f"Generation {k} finished, EMTTING TO STDOUT")
 
                 emitter.update_text(f.getvalue())
                 emitter.emit_data(socket)# give screen data to client
+
+                if k is None:
+                    break
 
             else:
                 k = run_loop(k)
