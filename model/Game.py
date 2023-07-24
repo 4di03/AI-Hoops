@@ -22,6 +22,7 @@ sys.path.append('./model')
 from ReportingPopulation import ReportingPopulation
 sys.path.append('./util')
 from util import ScreenDataEmitter
+import multiprocessing
 # from application import config_data, create_config_file
 #
 # import pydevd_pycharm
@@ -34,7 +35,8 @@ game_map = {}
 GAME_FRAMERATE = 200
 
 CHOSEN_FPS = TICKS_PER_SEC
-
+num_processes = multiprocessing.cpu_count()  # Number of CPU cores available
+print("NUM AVAILABLE CPUS:", num_processes)
 #only for solo mode
 def make_move(input):
 
@@ -93,6 +95,31 @@ class Game:
 
         self.gen = 0
 
+
+    def move_ball_chunk(self, chunk, nets, ge, dt):
+        '''
+        Move all balls designated by the indices in chunk
+        '''
+        for i in chunk:
+            ball = self.balls[i]
+            ball.move(nets, ge, i, self, dt)
+    def move_balls(self, nets, ge, dt):
+        '''
+        Uses parallel processing to move all balls concurrently.
+        '''
+        chunk_size = len(self.balls) // num_processes
+        chunks = [list(range(start, start + chunk_size)) for start in range(0, len(self.balls), chunk_size)]
+
+        # If there's a remaining chunk, add it to the last process
+        if len(chunks[-1]) < chunk_size:
+            last_chunk = chunks.pop()
+            chunks[-1] += last_chunk
+
+        with multiprocessing.Pool(processes=num_processes) as pool:
+            pool.starmap(self.move_ball_chunk, [(chunk, nets, ge, dt) for chunk in chunks])
+
+
+
     def run_frame(self, pyClock, nets, ge, last_time = 0):
         '''
         Moves all balls in game in a single frame
@@ -115,7 +142,7 @@ class Game:
         # print(f"running game for {request.sid}")
     
         
-
+        #self.move_balls(nets, ge, dt)
         i = len(self.balls) - 1
         while i >= 0:
 
