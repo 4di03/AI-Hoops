@@ -21,8 +21,9 @@ from abc import ABC, abstractmethod
 sys.path.append('./model')
 from ReportingPopulation import ReportingPopulation
 sys.path.append('./util')
-from util import ScreenDataEmitter
+from util import ScreenDataEmitter, get_ram_usage, get_max_available_ram
 import multiprocessing
+
 # from application import config_data, create_config_file
 #
 # import pydevd_pycharm
@@ -45,7 +46,6 @@ def make_move(input):
     game = game_map[sid]
 
 
-    # print(f'trying to move, SID: {sid}, request.id: {request.sid}, game: {game}, true game socketid: {game.name}')
     if sid == request.sid and sid == game.name and game.solo:
         if msg == "right" and len(game.balls) > 0:
             game.balls[0].jump(True)
@@ -193,10 +193,8 @@ class GameController:
         self.main(genomes,config)
     def train_AI(self):
         self.game.config_path = "./model/config.txt"
-        graphics = False#self.game.graphics TRYING THISs
 
-        #self.game.graphics = True # only THIS DOES
-
+        graphics = self.game
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, self.game.config_path)
         
@@ -284,7 +282,6 @@ class GameController:
 
             @socket.on('quit')
             def quit_game(sid):
-                # print(f'trying to quit, SID: {sid}, request.id: {request.sid}, game: {self}, true game socketid: {self.name}')
 
                 if sid in game_map:
                     game = game_map[sid]
@@ -298,7 +295,8 @@ class GameController:
 
             skip_frames = round(TICKS_PER_SEC/self.game.framerate)
 
-
+            if tick_ct % (TICKS_PER_SEC * 2) == 0 :
+                print(f"{round(get_ram_usage())} MB RAM used out of {round(get_max_available_ram())} MB available")
 
             if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second TRYNG THIS
 

@@ -105,7 +105,7 @@ def game():
 @app.route('/text_view/')
 def text_game():
     #only by sending this page first will the client be connected to the socketio instance
-    return render_template('text_view.html') # trying canvas
+    return render_template('text_view.html') 
 
 @app.route('/train/')
 def train_menu():

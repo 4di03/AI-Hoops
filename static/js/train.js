@@ -27,7 +27,7 @@ function openTextMode(mode, socket){
 
         setTimeout(
             function(){
-                window.location.replace('../text_view'); // trying game
+                window.location.replace('../text_view'); 
             }, 1000
 
         );
@@ -133,7 +133,6 @@ $(document).ready(function(){
             openCanvas('train', socket);
         } else{
             console.log(socket)
-            //openCanvas('train', socket);// trying this
             openTextMode('train', socket); 
 
             //openTextMode('train', socket)

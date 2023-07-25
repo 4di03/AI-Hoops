@@ -2,6 +2,22 @@ from flask import request, copy_current_request_context
 from abc import ABC, abstractmethod
 import json
 import sys
+import psutil
+
+def get_ram_usage():
+    '''
+    returns ram usage in megabytes
+    '''
+    ram_usage_bytes = psutil.virtual_memory().used
+    ram_usage_mb = ram_usage_bytes / (1024 * 1024)  # Convert bytes to megabytes
+    return ram_usage_mb
+def get_max_available_ram():
+    '''
+    returns max available ram in megabytes
+    '''
+    max_available_ram_bytes = psutil.virtual_memory().total
+    max_available_ram_mb = max_available_ram_bytes / (1024 * 1024)  # Convert bytes to megabytes
+    return max_available_ram_mb
 
 class DataEmitter(ABC):
     '''
