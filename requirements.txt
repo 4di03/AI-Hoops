@@ -21,3 +21,4 @@ Werkzeug==2.2.2
 zipp==3.8.1
 zope.event==4.5.0
 zope.interface==5.4.0
+psutil==5.9.5
