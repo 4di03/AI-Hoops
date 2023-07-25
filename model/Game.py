@@ -194,7 +194,7 @@ class GameController:
     def train_AI(self):
         self.game.config_path = "./model/config.txt"
 
-        graphics = self.game
+        graphics = self.game.graphics
         config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
             neat.DefaultSpeciesSet, neat.DefaultStagnation, self.game.config_path)
         
