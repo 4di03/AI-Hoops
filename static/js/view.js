@@ -259,7 +259,13 @@ $(document).ready(function () {
             console.log(gameArea, " GAME AREA VALUE")
             socket.on('screen', updateCanvas);
 
+            socket.on('game_over', function (msg) {
+                ctx.fillStyle = 'white';
+                ctx.font = "20px Verdana";
+                ctx.fillText("GAME OVER \n" + `${msg}`, canvas.width * .4, canvas.height * .5)
 
+
+            });
             socket.on('stdout', function (msg) {
 
                 console.log("recieving at view.js", msg);

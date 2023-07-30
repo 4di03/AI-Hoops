@@ -7,7 +7,7 @@ from flask_socketio import SocketIO, emit
 from flask import Flask, render_template, url_for, copy_current_request_context, request
 from random import random
 from threading import Thread, Event
-from model.Game import Game, GameController
+from model.Game import Game, GameController, SoloGameController, TrainGameController, WinnerGameController, LocalGameController
 from model.objects import WIN_HEIGHT, WIN_WIDTH
 import json
 import configparser
@@ -53,7 +53,7 @@ socketio = SocketIO(app, async_mode="eventlet", logger=SHOW_FLASK_LOGS,
 CONFIG_SECTION_NAME = "UserConfig"
 
 
-#creates config.txt from config object
+#creates config.txt from config object 
 def create_config_file(parser, config_data):
     # print(parser.sections())
     for section in config_data:
@@ -149,6 +149,12 @@ def recieve_mode(mode):
 
     socketio.emit("got game", "")
 
+
+cmap = {'solo': SoloGameController, 
+        'train': TrainGameController, 
+        'record': WinnerGameController,
+        'local': LocalGameController}
+
 @socketio.on('start')
 def prompt_mode(sid):
     '''
@@ -164,25 +170,30 @@ def prompt_mode(sid):
         g = Game(config_data[CONFIG_SECTION_NAME] if CONFIG_SECTION_NAME in config_data else None, socketio, name = request.sid)
 
         #g.graphics = True # test game.graphics after this point is the culprit
-        gc = GameController(g)
+       
+        ctype = cmap[game_mode]
+        gc = ctype(g)
         games.append(gc)
 
-        # print("STARTING GAME FOR " + str(request.sid))
-        mode = None
-        if game_mode == "solo":
-            mode = games[-1].play_solo
-        elif game_mode == "train":
-            mode = games[-1].train_AI
-        elif game_mode.split("/")[0] == "winner":
+        # # print("STARTING GAME FOR " + str(request.sid))
+        # mode = None
+        # if game_mode == "solo":
+        #     mode = gc.play_solo
+        # elif game_mode == "train":
+        #     mode = gc.train_AI
+        # elif game_mode.split("/")[0] == "winner":
 
-            if game_mode.split("/")[1] == "record":
-                mode = games[-1].replay_genome
-            else:
-                mode = games[-1].replay_local_genome
+        #     if game_mode.split("/")[1] == "record":
+        #         mode = gc.replay_genome
+        #     else:
+        #         mode = gc.replay_local_genome
 
 
         start_t = time.time()
-        mode()
+        score = gc.mode()
+
+        if game_mode != 'train':
+            socketio.emit('game_over', f"Score: {score}", to = request.sid)
         print("L175, seconds till game end: ", time.time() - start_t)
 
 

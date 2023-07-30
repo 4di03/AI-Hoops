@@ -35,6 +35,8 @@ game_map = {}
 
 GAME_FRAMERATE = 200
 
+GET_RAM_USAGE = False
+
 CHOSEN_FPS = TICKS_PER_SEC
 num_processes = multiprocessing.cpu_count()  # Number of CPU cores available
 print("NUM AVAILABLE CPUS:", num_processes)
@@ -153,7 +155,7 @@ class Game:
             i -= 1
 
 
-class GameController:
+class GameController(ABC):
     '''
     Controller for Game object, runs the game , takes input, and runs NEAT after every frame.
     '''
@@ -162,35 +164,110 @@ class GameController:
         self.game = game
 
 
-    def replay_local_genome(self):
-        self.replay_genome(genome_path='model/local_winner.pkl')
-    
-    def replay_genome(self, framerate = TICKS_PER_SEC, genome_path="model/best_winner.pkl"):
-        # Load requried NEAT config
-        config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
-                                    neat.DefaultSpeciesSet, 
-                                    neat.DefaultStagnation, 
-                                    self.game.config_path)
-
-        # Unpickle saved winner
-        with open(genome_path, "rb") as f:
-            genome = pickle.load(f)
-
-        # Convert loaded genome into required data structure
-        genomes = [(1, genome)]
-
-        # Call game with only the loaded genome
-        self.main(genomes, config)
-
-
     
 
     def show_train(self):
         self.train_AI(True)
 
-    def show_main(self, genomes, config):
-        raise Exception("GRAPHICS MODE")
-        self.main(genomes,config)
+   
+
+    @abstractmethod
+    def mode(self):
+        '''
+        Run the game mode for this controller, and get score for best ball.
+        '''
+
+        raise NotImplementedError
+
+    def main(self, genomes, config):
+        '''
+        main method for the game, runs the game loop and emits screen data to client
+        args:
+            display: whether or not to emit screen data to client, if False, emit stdout string buffer to client
+        '''
+        global game_map
+        nets = [] # list of neural networks
+        ge = [] # list of genomes
+        display = self.game.graphics
+
+
+        for genome_id , g in genomes:
+            net = self.game.net_type.create(g, config)
+            nets.append(net)
+            Ball(self.game)
+            g.fitness = 0
+            ge.append(g)
+
+        b = None
+        if len(self.game.balls) == 1:
+            b = self.game.balls[0]
+
+        pyClock = pygame.time.Clock()
+            
+        run = len(self.game.balls)
+        self.game.name = request.sid
+        game_map[request.sid] = self.game
+        tick_ct = 0
+
+        emit_name = 'screen' #if not display else 'screen'
+
+
+        emitter = ScreenDataEmitter(self.game, name = emit_name)
+        while run:  
+            #print(len(self.game.balls))
+            if len(self.game.balls) == 0:
+
+                return b.score if b is not None else b# end the game if no balls on screen
+            last_time = time.time()
+            tick_ct += 1
+
+            self.game.run_frame(pyClock, nets , ge, last_time = last_time)
+            socket.on_event('input', make_move) # non-decorator version of socket.on
+
+            @socket.on('quit')
+            def quit_game(sid):
+
+                if sid in game_map:
+                    game = game_map[sid]
+                    if sid == request.sid and sid == game.name:
+                        # print("Quitting for " + sid +", " + str(self))
+                        if ge:
+                            ge[0].fitness = sys.maxsize
+                            game.kill = True
+                        game.balls = []
+
+
+            skip_frames = round(TICKS_PER_SEC/self.game.framerate)
+
+            if tick_ct % (TICKS_PER_SEC * 2) == 0 and GET_RAM_USAGE:
+                print(f"{round(get_ram_usage())} MB RAM used out of {round(get_max_available_ram())} MB available")
+
+            if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second TRYNG THIS
+
+                emitter.emit_data(socket= socket)
+            
+                # socket.emit(emit_name, self.game.graphics, to = request.sid)
+                # socket.sleep(0)
+
+            socket.sleep(0)# per https://stackoverflow.com/questions/55503874/flask-socketio-eventlet-error-client-is-gone-closing-socket
+
+
+
+class SoloGameController(GameController):
+
+    def mode(self):
+        Ball(self.game)
+        self.game.solo = True
+        return self.main([],None)
+
+
+class TrainGameController(GameController):
+
+
+    def __init__(self,game):
+        super().__init__(game)
+
+
     def train_AI(self):
         self.game.config_path = "./model/config.txt"
 
@@ -234,78 +311,41 @@ class GameController:
         self.game.kill = False
 
 
-    def play_solo(self):
-        Ball(self.game)
-        self.game.solo = True
-        self.main([],None)
+
+    def mode(self):
+        self.train_AI()
+        return None
+    
+
+class WinnerGameController(GameController):
 
 
-    def main(self, genomes, config):
-        '''
-        main method for the game, runs the game loop and emits screen data to client
-        args:
-            display: whether or not to emit screen data to client, if False, emit stdout string buffer to client
-        '''
-        global game_map
-        nets = [] # list of neural networks
-        ge = [] # list of genomes
-        display = self.game.graphics
+    def replay_genome(self, framerate = TICKS_PER_SEC, genome_path="model/best_winner.pkl"):
+        # Load requried NEAT config
+        config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, 
+                                    neat.DefaultSpeciesSet, 
+                                    neat.DefaultStagnation, 
+                                    self.game.config_path)
+
+        # Unpickle saved winner
+        with open(genome_path, "rb") as f:
+            genome = pickle.load(f)
+
+        # Convert loaded genome into required data structure
+        genomes = [(1, genome)]
+
+        # Call game with only the loaded genome
+        return self.main(genomes, config)
+    def mode(self):
+
+        return self.replay_genome()
 
 
-        for genome_id , g in genomes:
-            net = self.game.net_type.create(g, config)
-            nets.append(net)
-            Ball(self.game)
-            g.fitness = 0
-            ge.append(g)
-
-        pyClock = pygame.time.Clock()
-            
-        run = len(self.game.balls)
-        self.game.name = request.sid
-        game_map[request.sid] = self.game
-        tick_ct = 0
-
-        emit_name = 'screen' #if not display else 'screen'
+class LocalGameController(WinnerGameController):
 
 
-        emitter = ScreenDataEmitter(self.game, name = emit_name)
-        while run:  
-            #print(len(self.game.balls))
-            if len(self.game.balls) == 0:
-                return  # end the game if no balls on screen
-            last_time = time.time()
-            tick_ct += 1
-
-            self.game.run_frame(pyClock, nets , ge, last_time = last_time)
-            socket.on_event('input', make_move) # non-decorator version of socket.on
-
-            @socket.on('quit')
-            def quit_game(sid):
-
-                if sid in game_map:
-                    game = game_map[sid]
-                    if sid == request.sid and sid == game.name:
-                        # print("Quitting for " + sid +", " + str(self))
-                        if ge:
-                            ge[0].fitness = sys.maxsize
-                            game.kill = True
-                        game.balls = []
-
-
-            skip_frames = round(TICKS_PER_SEC/self.game.framerate)
-
-            if tick_ct % (TICKS_PER_SEC * 2) == 0 :
-                print(f"{round(get_ram_usage())} MB RAM used out of {round(get_max_available_ram())} MB available")
-
-            if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second TRYNG THIS
-
-                emitter.emit_data(socket= socket)
-            
-                # socket.emit(emit_name, self.game.graphics, to = request.sid)
-                # socket.sleep(0)
-
-            socket.sleep(0)# per https://stackoverflow.com/questions/55503874/flask-socketio-eventlet-error-client-is-gone-closing-socket
-
-
-
+    def replay_local_genome(self):
+        return self.replay_genome(genome_path='model/local_winner.pkl')
+    
+    def mode(self):
+        return self.replay_local_genome()

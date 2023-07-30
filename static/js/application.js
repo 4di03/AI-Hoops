@@ -108,7 +108,7 @@ $(document).ready(function(){
             click: function(){
                 $("#dialog").dialog("close");
                 model_type = "record";
-                openCanvas('winner/'+model_type, socket);
+                openCanvas(model_type, socket);
             }
         },
         {
@@ -117,7 +117,7 @@ $(document).ready(function(){
                 $("#dialog").dialog("close");
 
                 model_type = "local"
-                openCanvas('winner/'+model_type, socket);
+                openCanvas(model_type, socket);
             }
         }
         ],
