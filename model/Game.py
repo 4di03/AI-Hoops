@@ -244,7 +244,6 @@ class GameController(ABC):
                 print(f"{round(get_ram_usage())} MB RAM used out of {round(get_max_available_ram())} MB available")
 
             if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second TRYNG THIS
-                print("L246 EMTTING DATA")
                 emitter.emit_data(socket= socket)
             
                 # socket.emit(emit_name, self.game.graphics, to = request.sid)
