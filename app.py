@@ -15,7 +15,7 @@ from flask_cors import CORS
 import logging
 import time
 
-SHOW_FLASK_LOGS = True
+SHOW_FLASK_LOGS = False
 
 if not SHOW_FLASK_LOGS:
     log = logging.getLogger('werkzeug')
