@@ -86,7 +86,7 @@ class Game:
             else: 
                 self.net_type = neat.nn.RecurrentNetwork
 
-            self.graphics = custom_config["graphics_choice"] == "true"
+            self.graphics = (custom_config["graphics_choice"] == "true")
             self.override_winner = custom_config["winner_choice"] == "true"
 
             self.custom_config = custom_config
@@ -213,6 +213,7 @@ class GameController(ABC):
 
 
         emitter = ScreenDataEmitter(self.game, name = emit_name)
+        #print("L126", run, display)
         while run:  
             #print(len(self.game.balls))
             if len(self.game.balls) == 0:
@@ -243,7 +244,7 @@ class GameController(ABC):
                 print(f"{round(get_ram_usage())} MB RAM used out of {round(get_max_available_ram())} MB available")
 
             if (tick_ct % skip_frames) == 0 and display: #only emit data for self.game.framerate frames per second TRYNG THIS
-
+                print("L246 EMTTING DATA")
                 emitter.emit_data(socket= socket)
             
                 # socket.emit(emit_name, self.game.graphics, to = request.sid)
@@ -335,6 +336,8 @@ class WinnerGameController(GameController):
         genomes = [(1, genome)]
 
         # Call game with only the loaded genome
+        #print(f"L 314 replaying genome with {genome_path}")
+        #self.game.graphics = True
         return self.main(genomes, config)
     def mode(self):
 

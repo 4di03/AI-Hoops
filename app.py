@@ -15,7 +15,7 @@ from flask_cors import CORS
 import logging
 import time
 
-SHOW_FLASK_LOGS = False
+SHOW_FLASK_LOGS = True
 
 if not SHOW_FLASK_LOGS:
     log = logging.getLogger('werkzeug')
@@ -162,6 +162,7 @@ def prompt_mode(sid):
         sid: socket/session id of client
     '''
     global games
+    global config_data
     # print(f'starting for {sid} with current request.id: {request.sid}')
     if sid == request.sid: # check if the current request is the same as the one that sent the start message
         #choose the gamemode for the game
@@ -194,6 +195,8 @@ def prompt_mode(sid):
 
         if game_mode != 'train':
             socketio.emit('game_over', f"Score: {score}", to = request.sid)
+        else:
+            config_data = {} # reset config after trainign is over
         print("L175, seconds till game end: ", time.time() - start_t)
 
 

@@ -1,8 +1,8 @@
 [NEAT]
 fitness_criterion = max
-fitness_threshold = 4126
-pop_size = 17
-reset_on_extinction = true
+fitness_threshold = 25050
+pop_size = 51
+reset_on_extinction = false
 
 [DefaultGenome]
 activation_default = relu
@@ -20,8 +20,8 @@ bias_mutate_rate = 0.7
 bias_replace_rate = 0.1
 compatibility_disjoint_coefficient = 1.0
 compatibility_weight_coefficient = 0.5
-conn_add_prob = 0.12
-conn_delete_prob = 0.14
+conn_add_prob = 0.5
+conn_delete_prob = 0.5
 enabled_default = True
 enabled_mutate_rate = 0.1
 feed_forward = True
@@ -51,10 +51,10 @@ compatibility_threshold = 3.0
 
 [DefaultStagnation]
 species_fitness_func = max
-max_stagnation = 110
+max_stagnation = 501
 species_elitism = 0
 
 [DefaultReproduction]
 elitism = 2
-survival_threshold = 0.2
+survival_threshold = 0.55
 

@@ -262,7 +262,7 @@ $(document).ready(function () {
             socket.on('game_over', function (msg) {
                 ctx.fillStyle = 'white';
                 ctx.font = "20px Verdana";
-                ctx.fillText("GAME OVER \n" + `${msg}`, canvas.width * .4, canvas.height * .5)
+                ctx.fillText("GAME OVER\n" + `${msg}`, canvas.width * .4, canvas.height * .5)
 
 
             });
