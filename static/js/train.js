@@ -58,13 +58,8 @@ $(document).ready(function(){
     var protocol = window.location.protocol;
     var socket = io.connect(protocol+ '//' + document.domain + ':' + location.port);
 
-    let menu_btn = document.getElementById("menu-btn");
     let submit_btn = document.getElementById("submit-btn");
     
-
-    menu_btn.addEventListener("click", event => {
-        window.location.replace("/");
-    });
 
     submit_btn.addEventListener("click", event => {
 

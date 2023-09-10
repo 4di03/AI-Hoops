@@ -227,7 +227,7 @@ $(document).ready(function () {
             };
 
 
-            drawQuitButton(rect)
+            //drawQuitButton(rect)
 
             //lText(socket.id + ": "  + secondsElapsed,.6*canvas.width, .1*canvas.height);
 
@@ -278,7 +278,7 @@ $(document).ready(function () {
                     socket.emit("input", "right#" + socket.id);
                 } else if (event.key == "m") {
 
-                    window.returnToMenu(socket)
+                    //window.returnToMenu(socket) #disabeled functionalty after changin quit button
                 }
             });
 

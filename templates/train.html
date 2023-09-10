@@ -13,6 +13,7 @@
 
     <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="../static/css/train_style.css">
+    <script type="module" src="../static/js/util.js"></script>
 
     <script src="../static/components/config-input.js" type="text/javascript" defer></script>
 
@@ -50,7 +51,7 @@
             </li>
     
             <li>
-                <config-input type="range" min = 1 max=1000 step =1  id="max_stagnation" section = "DefaultStagnation">Max Allowed Species Stagnation</config-input>
+                <config-input type="range" min = 1 max=1000 step =1  id="max_stagnation" section = "DefaultStagnation">Species Stagnation Tolerance</config-input>
 
             </li>
             <li>
@@ -74,7 +75,7 @@
             </li>
 
             <li>
-                <config-input type="checkbox" id="graphics_choice", section = "UserConfig">Graphics On(slows down training)</config-input>
+                <config-input type="checkbox" id="graphics_choice", section = "UserConfig">Graphics On</config-input>
             </li>
 
             <li>

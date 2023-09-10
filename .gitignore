@@ -1,3 +1,8 @@
 __pycache__
 env/
 Untitled.ipynb
+.idea/
+.ipynb_checkpoints
+env/
+venv/
+Untitled.ipynb

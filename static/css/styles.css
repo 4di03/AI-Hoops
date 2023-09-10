@@ -19,3 +19,10 @@ canvas{
   animation: fadeOut;
   animation-duration: 0.5s;
 }
+
+#menu-btn{
+
+  position:absolute;
+  left:45%;
+  top:2%;
+}

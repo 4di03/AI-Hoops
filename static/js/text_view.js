@@ -12,11 +12,7 @@ $(document).ready(function () {
 
     }
 
-    let menu_btn = document.getElementById("menu-btn");
-
-    menu_btn.addEventListener("click", event => {
-        window.returnToMenu(socket);
-    });
+  
 
     socket.on('connect', function () {
 

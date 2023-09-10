@@ -87,46 +87,47 @@ $(document).ready(function(){
 
     train_btn.addEventListener('click', event =>{
 
-        openTrainSettings('train', socket);
+        window.location.replace("train")
     });
 
-    let model_type = "record";
-    $("#dialog").dialog({
-        autoOpen: false,
-        modal: true,
-        show: {
-            effect: "fade",
-            duration: 1000
-        },
-        hide: {
+    // let model_type = "record";
+    // $("#dialog").dialog({
+    //     autoOpen: false,
+    //     modal: true,
+    //     show: {
+    //         effect: "fade",
+    //         duration: 1000
+    //     },
+    //     hide: {
 
-            effect: "blind",
-            duration: 500
-        }, 
-        buttons: [{
-            text:"Use Record Model",
-            click: function(){
-                $("#dialog").dialog("close");
-                model_type = "record";
-                openCanvas(model_type, socket);
-            }
-        },
-        {
-            text: "Use Local Best Model",
-            click : function(){
-                $("#dialog").dialog("close");
+    //         effect: "blind",
+    //         duration: 500
+    //     }, 
+    //     buttons: [{
+    //         text:"Use Record Model",
+    //         click: function(){
+    //             $("#dialog").dialog("close");
+    //             model_type = "record";
+    //             openCanvas(model_type, socket);
+    //         }
+    //     },
+    //     {
+    //         text: "Use Local Best Model",
+    //         click : function(){
+    //             $("#dialog").dialog("close");
 
-                model_type = "local"
-                openCanvas(model_type, socket);
-            }
-        }
-        ],
-        minWidth: 600
-        });
+    //             model_type = "local"
+    //             openCanvas(model_type, socket);
+    //         }
+    //     }
+    //     ],
+    //     minWidth: 600
+    //     });
 
     winner_btn.addEventListener('click', event =>{
 
-        $('#dialog').dialog("open",{modal:true});
+        //$('#dialog').dialog("open",{modal:true});
+        window.location.replace("model_selection")
 
         
     });

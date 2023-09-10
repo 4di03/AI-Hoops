@@ -111,6 +111,10 @@ def text_game():
 def train_menu():
     return render_template('train.html')
 
+@app.route('/model_selection')
+def model_menu():
+    return render_template('model_menu.html')
+
 
 @socketio.on('message')
 def handle_message(data):

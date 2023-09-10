@@ -77,7 +77,7 @@ class ConfigInput extends HTMLElement{
 
         } else if (this.type =="checkbox"){
             this.innerHTML = `${this.text} <div class = "${this.type}" id ="${this.id}">
-            <input  id = ${this.id} type = "${this.type}" />
+            <input  id = ${this.id} type = "${this.type}" checked />
             </div>`;
 
 

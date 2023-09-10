@@ -19,6 +19,23 @@ function returnToMenu(socket) {
     setTimeout(window.location.replace("/"));
 }
 
+
+
 window.returnToMenu = returnToMenu;
 
 window.initGame = initGame;
+
+$(document).ready(function () {
+let menu_btn = document.getElementById("menu-btn"); // add event listener to menu-btn button
+
+if (menu_btn != null){
+
+
+var protocol = window.location.protocol;
+var socket = io.connect(protocol + '//' + document.domain + ':' + location.port);
+
+menu_btn.addEventListener("click", event => {
+    window.returnToMenu(socket);
+});
+}
+});

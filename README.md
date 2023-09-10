@@ -22,6 +22,5 @@ If your AI beats the record of the globally best AI, it will replace it as the '
 TODO:
  - Death animation in Solo mode
  - NEAT NN DISPLAY during training
- - No Graphics Training
  - Model saved indication
    
