@@ -2,7 +2,7 @@
 fitness_criterion = max
 fitness_threshold = 25050
 pop_size = 51
-reset_on_extinction = false
+reset_on_extinction = true
 
 [DefaultGenome]
 activation_default = relu
